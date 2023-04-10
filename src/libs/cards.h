@@ -1,11 +1,11 @@
 #ifndef CARDS_H
 #define CARDS_H
 
+#include "collections.h"
 #include "events.h"
 #include "players.h"
 
 #define MAX_CARDS 100
-#define NUM_CARDS 2
 
 #define DECK_SIZE 20
 #define HAND_SIZE 5
@@ -18,6 +18,8 @@ extern const char* ON_CARD_DESTROYED_EVENT_NAME;
 extern const char* ON_CARD_ATTACKED_EVENT_NAME;
 extern const char* ON_CARD_DAMAGED_EVENT_NAME;
 extern const char* ON_CARD_KILLED_EVENT_NAME;
+
+extern HashMap* ALL_CARDS;
 
 typedef struct {
     Callback played;
@@ -45,10 +47,10 @@ typedef struct {
 
 } Card;
 
+
 void setup_card(Card* card, Player* owner);
 Card* copy_card(Card* original);
-
-extern Card* CARDS[MAX_CARDS];
+void init_cards();
 
 
 #endif // CARDS_H

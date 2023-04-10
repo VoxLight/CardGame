@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
+#include "collections.h"
 #include "console.h"
 #include "events.h"
 #include "color_print.h"
@@ -25,7 +27,7 @@ int register_command(char* name, char* description, char* usage, CommandCallback
     return 0;
 }
 
-void _command_help(char* command, char** args) {
+void _command_help(char* command_name, char** args) {
     print_colored(COLOR_PRINT_YELLOW ,"Commands:\n");
     set_text_color(COLOR_PRINT_MAGENTA);
     for (int i = 0; i < __commands->size; i++) {
@@ -38,34 +40,63 @@ void _command_help(char* command, char** args) {
     reset_text_color();
 }
 
-void _command_not_found(char* message, char** args){
-    print_colored(COLOR_PRINT_RED ,"Command \"%s\" not found.\n", message);
+void _command_not_found(char* command_name, char** args){
+    print_colored(COLOR_PRINT_RED ,"Command \"%s\" not found.\n", command_name);
     print_colored(COLOR_PRINT_MAGENTA ,"Use 'help' for usage examples.\n");
 }
+
+char** _command_parse(const char *input) {
+    char *str = strdup(input);
+    int capacity = 10;
+    char **words = (char **)malloc(capacity * sizeof(char *));
+    int count = 0;
+    bool in_quotes = false;
+    char *start = str;
+    bool last_char_space = true;
+
+    for (char *ptr = str; *ptr != '\0'; ++ptr) {
+        if (*ptr == '\"') {
+            in_quotes = !in_quotes;
+            if (in_quotes) {
+                start = ptr + 1;
+            } else {
+                *ptr = '\0';
+                words[count++] = strdup(start);
+                last_char_space = true;
+            }
+        } else if (*ptr == ' ' && !in_quotes) {
+            *ptr = '\0';
+            if (!last_char_space && start != ptr) {
+                words[count++] = strdup(start);
+            }
+            start = ptr + 1;
+            last_char_space = true;
+        } else {
+            last_char_space = false;
+        }
+
+        if (count == capacity) {
+            capacity *= 2;
+            words = (char **)realloc(words, capacity * sizeof(char *));
+        }
+    }
+
+    if (!in_quotes && start != str + strlen(str) && !last_char_space) {
+        words[count++] = strdup(start);
+    }
+    words[count] = NULL;
+
+    free(str);
+    return words;
+}
+
 
 void _handle_on_chat(va_list args) {
     char* message = va_arg(args, char*);
 
-    // Split the message into it's command name and a list of arguments
-    char* command_name = strtok(message, " ");
-    if (command_name == NULL) {
-        return;
-    }
-
-    // Parse the arguments into a list. This is a bit messy, but it works.
-    char* next_arg = strtok(NULL, " ");
-    char** command_args = NULL;
-    if (next_arg != NULL) {
-        command_args = (char**)malloc(sizeof(char*));
-        int i = 0;
-        while (next_arg != NULL) {
-            command_args[i] = next_arg;
-            next_arg = strtok(NULL, " ");
-            i++;
-            command_args = (char**)realloc(command_args, sizeof(char*) * (i + 1));
-        }
-        command_args[i] = NULL;
-    }
+    char** split_message = _command_parse(message);
+    char* command_name = split_message[0];
+    char** command_args = split_message + 1;
 
     // Print the message and args for debug purposes only
     // printf("Message: %s\n", message);
@@ -81,9 +112,9 @@ void _handle_on_chat(va_list args) {
     Command* command = (Command*)hash_map_get(__commands, command_name);
 
     if (command != NULL) {
-        command->callback(message, command_args);
+        command->callback(command_name, command_args);
     } else {
-        _command_not_found(message, command_args);
+        _command_not_found(command_name, command_args);
     }
 }
 
