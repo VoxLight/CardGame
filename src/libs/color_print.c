@@ -3,9 +3,18 @@
 
 #include "color_print.h"
 
+#ifdef _WIN32
+#include <windows.h>
+void set_text_color(int color) {
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    SetConsoleTextAttribute(hConsole, color);
+}
+
+#else
 void set_text_color(int color) {
     printf("\033[%dm", color);
 }
+#endif
 
 void reset_text_color() {
     set_text_color(COLOR_PRINT_WHITE);
