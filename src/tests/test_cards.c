@@ -2,55 +2,68 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-
 #include "cards.h"
 #include "players.h"
+#include "collections.h"
 
-void activate_effect_used(Card* card, ...){
-    va_list args;
-    va_start(args, card);
-    card->on.effect_used(args);
-    va_end(args);
+void activate_effect_used(Card* card, ...) {
+    if (card->on.effect_used) {
+        va_list args;
+        va_start(args, card);
+        card->on.effect_used(args);
+        va_end(args);
+    }
 }
 
-void activate_played(Card* card, ...){
-    va_list args;
-    va_start(args, card);
-    card->on.played(args);
-    va_end(args);
+void activate_played(Card* card, ...) {
+    if (card->on.played) {
+        va_list args;
+        va_start(args, card);
+        card->on.played(args);
+        va_end(args);
+    }
 }
 
-void test_large_slime_played_callback() {
-    Card* large_slime = CARDS[0];
-    Player player;
-
-    // Initialize the Large Slime card and player
-    setup_card(large_slime, &player);
-
-    // Simulate the card being played
-    activate_played(large_slime, large_slime);
-
-    // Your test cases here to validate the state of the card, player, or any other related data
+void activate_damaged(Card* card, ...) {
+    if (card->on.damaged) {
+        va_list args;
+        va_start(args, card);
+        card->on.damaged(args);
+        va_end(args);
+    }
 }
 
-void test_harmless_bat_effect_activated_callback() {
-    Card* harmless_bat = CARDS[1];
-    Player player;
+void test_callbacks() {
+    init_cards();
 
-    // Initialize the Harmless Bat card and player
-    setup_card(harmless_bat, &player);
+    HashMap* all_cards = ALL_CARDS;
+    for (size_t i = 0; i < all_cards->size; i++) {
+        HashNode* node = all_cards->table[i];
+        while (node) {
+            Card* card = (Card*)node->value;
+            Player player;
 
+            // Initialize the card and player
+            setup_card(card, &player);
 
-    // Simulate the card effect being activated
-    activate_effect_used(harmless_bat, harmless_bat);
+            // Simulate the card being played
+            activate_played(card, card);
 
+            // Simulate the card effect being activated
+            activate_effect_used(card, card);
 
-    // Your test cases here to validate the state of the card, player, or any other related data
+            // Simulate the card being damaged
+            activate_damaged(card, card);
 
+            node = node->next;
+        }
+    }
 }
 
 void test_copy_card() {
-    Card* harmless_bat = CARDS[1];
+    init_cards();
+
+    Card* harmless_bat = hash_map_get(ALL_CARDS, "Harmless Bat");
     Card* copy = copy_card(harmless_bat);
 
     // Your test cases here to validate the state of the card, player, or any other related data
@@ -62,8 +75,8 @@ void test_copy_card() {
 }
 
 int main() {
-    test_large_slime_played_callback();
-    test_harmless_bat_effect_activated_callback();
+    test_callbacks();
+    test_copy_card();
     printf("All tests passed.\n");
     return 0;
 }

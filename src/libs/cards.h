@@ -3,7 +3,6 @@
 
 #include "collections.h"
 #include "events.h"
-#include "players.h"
 
 #define MAX_CARDS 100
 
@@ -37,8 +36,6 @@ typedef struct {
     const char* description;
     const char* effect;
 
-    Player* owner;
-
     Callbacks on;
 
     int pip_cost;
@@ -47,9 +44,8 @@ typedef struct {
 
 } Card;
 
-
-void setup_card(Card* card, Player* owner);
 Card* copy_card(Card* original);
+void setup_card(Card* card);
 void init_cards();
 
 
