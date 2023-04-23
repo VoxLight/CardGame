@@ -2,27 +2,31 @@
 #ifndef PLAYERS_H
 #define PLAYERS_H
 
+#include <stddef.h> // for size_t
+#include "cards.h"
+
 #define DECK_SIZE 20
 #define HAND_SIZE 5
-
-#include "collections.h"
-#include "cards.h"
 
 typedef struct {
     const char* name;
     int max_pips;
     int current_pips;
-    Card** hand;
-    Card** field;
-    Card** deck;
-    Card** discard;
+    size_t hand_size;
+    size_t field_size;
+    size_t deck_size;
+    size_t discard_size;
+    Card* hand[HAND_SIZE];
+    Card* field[DECK_SIZE];
+    Card* deck[DECK_SIZE];
+    Card* discard[DECK_SIZE];
 } Player;
 
 Player* create_player(const char* name, int max_pips);
 void add_card_to_deck(Player* player, const char* card_name);
 void draw_card(Player* player);
-int play_card(Player* player, int hand_index);
-void discard_card(Player* player, int field_index);
+int play_card(Player* player, size_t hand_index);
+void discard_card(Player* player, size_t field_index);
 void free_player(Player* player);
 
 #endif // PLAYERS_H

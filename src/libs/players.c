@@ -10,49 +10,79 @@ Player* create_player(const char* name, int max_pips) {
     player->name = name;
     player->max_pips = max_pips;
     player->current_pips = max_pips;
-    player->hand = (Card**)malloc(sizeof(Card*) * HAND_SIZE);
-    player->field = (Card**)malloc(sizeof(Card*) * DECK_SIZE);
-    player->deck = (Card**)malloc(sizeof(Card*) * DECK_SIZE);
-    player->discard = (Card**)malloc(sizeof(Card*) * DECK_SIZE);
+    player->hand_size = 0;
+    player->field_size = 0;
+    player->deck_size = 0;
+    player->discard_size = 0;
     return player;
 }
 
 void add_card_to_deck(Player* player, const char* card_name) {
-    Card* card_template = hash_map_get(ALL_CARDS, card_name);
-    if (card_template) {
-        Card* new_card = copy_card(card_template);
-        linked_list_append(&player->deck, new_card);
+    if (player->deck_size < DECK_SIZE) {
+        Card* card_template = hash_map_get(ALL_CARDS, card_name);
+        if (card_template) {
+            Card* new_card = copy_card(card_template);
+            player->deck[player->deck_size++] = new_card;
+        }
     }
 }
 
 void draw_card(Player* player) {
-    Card* card = linked_list_remove(&player->deck, 0);
-    if (card) {
-        linked_list_append(&player->hand, card);
+    if (player->deck_size > 0 && player->hand_size < HAND_SIZE) {
+        player->hand[player->hand_size++] = player->deck[--player->deck_size];
     }
 }
 
-int play_card(Player* player, int hand_index) {
-    Card* card = linked_list_remove(&player->hand, hand_index);
-    if (card && player->current_pips >= card->pip_cost) {
-        player->current_pips -= card->pip_cost;
-        linked_list_append(&player->field, card);
-        return 1;
+int play_card(Player* player, size_t hand_index) {
+    if (hand_index < player->hand_size) {
+        Card* card = player->hand[hand_index];
+        if (card && player->current_pips >= card->pip_cost) {
+            player->current_pips -= card->pip_cost;
+            player->field[player->field_size++] = card;
+
+            // Shift remaining cards in hand to fill the gap
+            for (size_t i = hand_index; i < player->hand_size - 1; ++i) {
+                player->hand[i] = player->hand[i + 1];
+            }
+            player->hand_size--;
+            return 1;
+        }
     }
     return 0;
 }
 
-void discard_card(Player* player, int field_index) {
-    Card* card = linked_list_remove(&player->field, field_index);
-    if (card) {
-        linked_list_append(&player->discard, card);
+void discard_card(Player* player, size_t field_index) {
+    if (field_index < player->field_size) {
+        Card* card = player->field[field_index];
+        player->discard[player->discard_size++] = card;
+
+        // Shift remaining cards in field to fill the gap
+        for (size_t i = field_index; i < player->field_size - 1; ++i) {
+            player->field[i] = player->field[i + 1];
+        }
+        player->field_size--;
     }
 }
 
 void free_player(Player* player) {
-    destroy_linked_list(&player->hand);
-    destroy_linked_list(&player->field);
-    destroy_linked_list(&player->deck);
-    destroy_linked_list(&player->discard);
-    free(player);
+    if (player) {
+        for (size_t i = 0; i < player->hand_size; ++i) {
+            free_card(player->hand[i]);
+        }
+
+        for (size_t i = 0; i < player->field_size; ++i) {
+            free_card(player->field[i]);
+        }
+
+        for (size_t i = 0; i < player->deck_size; ++i) {
+            free_card(player->deck[i]);
+        }
+
+        for (size_t i = 0; i < player->discard_size; ++i) {
+            free_card(player->discard[i]);
+        }
+
+        free(player);
+    }
 }
+

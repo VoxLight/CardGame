@@ -106,3 +106,18 @@ void init_cards(){
 
     Card* large_slime = hash_map_get(ALL_CARDS, "Large Slime");
 }
+
+void free_cards() {
+    for (size_t i = 0; i < ALL_CARDS->size; ++i) {
+        Card* card = ALL_CARDS->table[i]->value;
+        free_card(card);
+    }
+    hash_map_free(ALL_CARDS);
+}
+
+
+void free_card(Card* card) {
+    if (card) {
+        free(card);
+    }
+}

@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <ctype.h>
 
 #include "collections.h"
 #include "console.h"
@@ -9,6 +10,18 @@
 #include "color_print.h"
 
 const char* ON_CHAT_EVENT_NAME = "on_chat";
+
+int is_printable(char* message){
+    // Validate the input message
+    int is_valid = 1;
+    for (int i = 0; message[i] != 0; ++i) {
+        if (!isprint(message[i])) {
+            is_valid = 0;
+            break;
+        }
+    }
+
+}
 
 // create in main
 HashMap* __commands;
@@ -125,6 +138,16 @@ void start_console_loop() {
         char message[MAX_MESSAGE_LENGTH];
         print_colored(COLOR_PRINT_GREEN, "Enter a command: ");
         fgets(message, MAX_MESSAGE_LENGTH, stdin);
+
+        // check if nothing was entered
+        // NOT WORKING
+        if(message[0]=='\n'){
+            puts("Nothing was entered.");
+            continue;
+        }else if(!is_printable(message)){
+            puts("Contains invalid characters.");
+            continue;
+        }
 
         // Remove newline character from the input
         message[strcspn(message, "\n")] = 0;

@@ -44,6 +44,10 @@ typedef struct {
 Card* copy_card(Card* original);
 void setup_card(Card* card);
 void init_cards();
+void free_cards();
+void free_card(Card* card);
+
+
 
 
 #endif // CARDS_H

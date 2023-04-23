@@ -2,6 +2,8 @@
     "files.associations": {
         "players.h": "c",
         "cards.h": "c",
-        "events.h": "c"
+        "events.h": "c",
+        "stddef.h": "c",
+        "system_error": "c"
     }
 }
