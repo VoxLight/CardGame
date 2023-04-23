@@ -10,10 +10,10 @@ Player* create_player(const char* name, int max_pips) {
     player->name = name;
     player->max_pips = max_pips;
     player->current_pips = max_pips;
-    player->hand = create_linked_list();
-    player->field = create_linked_list();
-    player->deck = create_linked_list();
-    player->discard = create_linked_list();
+    player->hand = (Card**)malloc(sizeof(Card*) * HAND_SIZE);
+    player->field = (Card**)malloc(sizeof(Card*) * DECK_SIZE);
+    player->deck = (Card**)malloc(sizeof(Card*) * DECK_SIZE);
+    player->discard = (Card**)malloc(sizeof(Card*) * DECK_SIZE);
     return player;
 }
 

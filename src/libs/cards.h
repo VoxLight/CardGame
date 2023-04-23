@@ -6,9 +6,6 @@
 
 #define MAX_CARDS 100
 
-#define DECK_SIZE 20
-#define HAND_SIZE 5
-
 extern const char* ON_CARD_PLAYED_EVENT_NAME;
 extern const char* ON_CARD_DRAWN_EVENT_NAME;
 extern const char* ON_CARD_TARGETED_EVENT_NAME;

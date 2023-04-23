@@ -29,6 +29,7 @@
 *.dylib
 
 # Executables
+*.a
 *.exe
 *.out
 *.app
@@ -50,3 +51,7 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+# Windows crash reports
+hs_err_pid*
+src/tests/test_errors.log

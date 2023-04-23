@@ -2,6 +2,9 @@
 #ifndef PLAYERS_H
 #define PLAYERS_H
 
+#define DECK_SIZE 20
+#define HAND_SIZE 5
+
 #include "collections.h"
 #include "cards.h"
 
@@ -9,10 +12,10 @@ typedef struct {
     const char* name;
     int max_pips;
     int current_pips;
-    LinkedList hand;
-    LinkedList field;
-    LinkedList deck;
-    LinkedList discard;
+    Card** hand;
+    Card** field;
+    Card** deck;
+    Card** discard;
 } Player;
 
 Player* create_player(const char* name, int max_pips);

@@ -1,7 +1,7 @@
 // test_player.c
 #include <stdio.h>
-
-#include "cards.c"
+#include "cards.h"
+#include "players.h"
 
 void print_player_state(Player* player) {
     printf("Player: %s\n", player->name);
