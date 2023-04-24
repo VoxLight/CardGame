@@ -11,17 +11,27 @@
 
 const char* ON_CHAT_EVENT_NAME = "on_chat";
 
-int is_printable(char* message){
+bool is_printable(const char* message) {
     // Validate the input message
-    int is_valid = 1;
     for (int i = 0; message[i] != 0; ++i) {
-        if (!isprint(message[i])) {
-            is_valid = 0;
-            break;
+        // There were some unrecognized escape sequences getting through the 'isprint' function.
+        // This isn't very pretty, but helps us get around that. Before, the 
+        // string ' \"\'\p\t '" would cause a seg fault when entered into the console and it
+        // managed to get past isprint. Now it works as expected.
+        if (message[i] == '\\') {
+            if (message[i + 1] != 0 && strchr("abfnrtv\\\'\"", message[i + 1]) == NULL) {
+                return false;
+            } else {
+                ++i;  // Skip the next character (the recognized escape sequence)
+            }
+        } else if (!isprint(message[i])) {
+            return false;
         }
     }
-
+    return true;
 }
+
+
 
 // create in main
 HashMap* __commands;
@@ -144,13 +154,15 @@ void start_console_loop() {
         if(message[0]=='\n'){
             puts("Nothing was entered.");
             continue;
-        }else if(!is_printable(message)){
-            puts("Contains invalid characters.");
-            continue;
         }
 
         // Remove newline character from the input
         message[strcspn(message, "\n")] = 0;
+
+        if(!is_printable(message)){
+            puts("Contains invalid characters.");
+            continue;
+        }
 
         if (strcmp(message, "exit") == 0) {
             break;

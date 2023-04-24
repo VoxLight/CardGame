@@ -41,10 +41,9 @@ void test_callbacks() {
         HashNode* node = all_cards->table[i];
         while (node) {
             Card* card = (Card*)node->value;
-            Player player;
 
             // Initialize the card and player
-            setup_card(card, &player);
+            setup_card(card);
 
             // Simulate the card being played
             activate_played(card, card);

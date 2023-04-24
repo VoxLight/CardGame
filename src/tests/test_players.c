@@ -7,17 +7,17 @@ void print_player_state(Player* player) {
     printf("Player: %s\n", player->name);
     printf("Current pips: %d\n", player->current_pips);
     printf("Hand:\n");
-    for (int i = 0; i < player->hand.size; i++) {
+    for (int i = 0; i < player->hand_size; i++) {
         Card* card = linked_list_remove(&player->hand, i);
         printf("  %s\n", card->name);
     }
     printf("Field:\n");
-    for (int i = 0; i < player->field.size; i++) {
+    for (int i = 0; i < player->field_size; i++) {
         Card* card = linked_list_remove(&player->field, i);
         printf("  %s\n", card->name);
     }
-    printf("Deck size: %d\n", player->deck.size);
-    printf("Discard size: %d\n", player->discard.size);
+    printf("Deck size: %d\n", player->deck_size);
+    printf("Discard size: %d\n", player->discard_size);
 }
 
 int main() {
@@ -28,7 +28,7 @@ int main() {
     Player* player = create_player("Alice", 5);
 
     // Add cards to the player's deck
-    add_card_to_deck(player, "Basic Card A");
+    add_card_to_deck(player, "Harmless Bat");
     add_card_to_deck(player, "Basic Card B");
     add_card_to_deck(player, "Basic Card A");
     add_card_to_deck(player, "Basic Card C");

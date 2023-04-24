@@ -4,14 +4,17 @@
 #include <string.h>
 
 #include "collections.h"
-#include "events.h"
 #include "cards.h"
 
+// Card*, Player*
 const char* ON_CARD_PLAYED_EVENT_NAME       = "on_card_played";
+
+
 const char* ON_CARD_DRAWN_EVENT_NAME        = "on_card_drawn";
+
+
 const char* ON_CARD_TARGETED_EVENT_NAME     = "on_card_targeted";
 const char* ON_CARD_EFFECT_USED_EVENT_NAME  = "on_card_effect_used";
-const char* ON_CARD_DESTROYED_EVENT_NAME    = "on_card_destroyed";
 const char* ON_CARD_ATTACKED_EVENT_NAME     = "on_card_attacked";
 const char* ON_CARD_DAMAGED_EVENT_NAME      = "on_card_damaged";
 const char* ON_CARD_KILLED_EVENT_NAME       = "on_card_killed";
@@ -37,7 +40,6 @@ static Card LARGE_SLIME = {
     .attack = 1,
     .defense = 1,
 };
-
 
 void _harmless_bat_effect_activated(va_list args){
     Card* target_card = va_arg(args, Card*);
@@ -97,6 +99,8 @@ Card* copy_card(Card* original){
 }
 
 void init_cards(){
+    create_event(ON_CARD_PLAYED_EVENT_NAME);
+
     ALL_CARDS = hash_map_create(MAX_CARDS);
 
     hash_map_put(ALL_CARDS, LARGE_SLIME.name, &LARGE_SLIME);
@@ -114,7 +118,6 @@ void free_cards() {
     }
     hash_map_free(ALL_CARDS);
 }
-
 
 void free_card(Card* card) {
     if (card) {

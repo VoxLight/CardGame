@@ -6,7 +6,7 @@
 #include "cards.h"
 
 #define DECK_SIZE 20
-#define HAND_SIZE 5
+#define HAND_SIZE 7
 
 typedef struct {
     const char* name;
