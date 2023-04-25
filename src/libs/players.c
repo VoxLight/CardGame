@@ -24,22 +24,22 @@ void print_player_state(Player* player) {
     printf("Hand Size: %d\n", player->hand_size);
     for (int i = 0; i < player->hand_size; i++) {
         Card* card = player->hand[i];
-        printf("  %s\n", card->name);
+        print_card(card);
     }
     printf("Field Size: %d\n", player->field_size);
     for (int i = 0; i < player->field_size; i++) {
         Card* card = player->hand[i];
-        printf("  %s\n", card->name);
+        print_card(card);
     }
     printf("Deck size: %d\n", player->deck_size);
     for (int i = 0; i < player->deck_size; i++) {
         Card* card = player->deck[i];
-        printf("  %s\n", card->name);
+        print_card(card);
     }
     printf("Discard size: %d\n", player->discard_size);
     for (int i = 0; i < player->discard_size; i++) {
         Card* card = player->discard[i];
-        printf("  %s\n", card->name);
+        print_card(card);
     }
 }
 
@@ -56,6 +56,25 @@ int add_card_to_deck(Player* player, const char* card_name) {
             player->deck[player->deck_size++] = new_card;
             return 0;
         }
+    }
+    return -1;
+}
+
+int add_card_to_field(Player* player, const char* card_name) {
+    printf("add_card_to_field_args: %s %s\n", player->name, card_name);
+    if (player->field_size < DECK_SIZE) {
+        Card* card_template = hash_map_get(ALL_CARDS, card_name);
+        if (card_template) {
+            Card* new_card = copy_card(card_template);
+            printf("New Card: %s\n", new_card->name);
+            player->field[player->field_size++] = new_card;
+            printf("Card on Field: %s\n", player->field[player->field_size-1]->name);
+            // Question on whether this should trigger the card played event
+            // Maybe it should.
+            trigger_event(ON_CARD_PLAYED_EVENT_NAME, player->field[player->field_size-1], player);
+            return 0;
+        }
+        return -2;
     }
     return -1;
 }
@@ -121,6 +140,7 @@ int discard_card(Player* player, size_t field_index) {
     }
     Card* card = player->field[field_index];
     player->discard[player->discard_size++] = card;
+    trigger_event(ON_CARD_KILLED_EVENT_NAME, player->discard[player->discard_size-1], player);
 
     // Shift remaining cards in field to fill the gap
     for (size_t i = field_index; i < player->field_size - 1; ++i) {

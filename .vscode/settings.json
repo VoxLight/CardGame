@@ -4,6 +4,8 @@
         "cards.h": "c",
         "events.h": "c",
         "stddef.h": "c",
-        "system_error": "c"
+        "system_error": "c",
+        "color_print.h": "c",
+        "stdio.h": "c"
     }
 }

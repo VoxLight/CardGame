@@ -22,21 +22,6 @@ void cmd_echo(char* command_name, char** args) {
     puts("");
 }
 
-void _print_card(Card* card){
-    print_colored(COLOR_PRINT_YELLOW, "%s ", card->name);
-    printf("(");
-    print_colored(COLOR_PRINT_CYAN, "%d*", card->pip_cost);
-    printf("/");
-    print_colored(COLOR_PRINT_RED, "%d", card->attack);
-    printf("/");
-    print_colored(COLOR_PRINT_GREEN, "%d", card->defense);
-    printf(")\n");
-    print_colored(COLOR_PRINT_MAGENTA, "    Description:");
-    printf(" %s\n", card->description);
-    print_colored(COLOR_PRINT_MAGENTA, "    Effect:");
-    printf(" %s\n", card->effect);
-}
-
 void cmd_card_info(char* command_name, char** args){
     Card* card;
     if (args[0] == NULL) {
@@ -44,7 +29,7 @@ void cmd_card_info(char* command_name, char** args){
         for (int i = 0; i < ALL_CARDS->size; i++) {
             if(ALL_CARDS->table[i] == NULL) continue;
             Card* card = (Card*)(ALL_CARDS->table[i]->value);
-            _print_card(card);
+            print_card(card);
         }
     }else {
         Card* card = hash_map_get(ALL_CARDS, args[0]);
@@ -52,7 +37,7 @@ void cmd_card_info(char* command_name, char** args){
             printf("Card \"%s\" not found.\n", args[0]);
             return;
         }
-        _print_card(card);
+        print_card(card);
     }
 
 }

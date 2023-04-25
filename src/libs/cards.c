@@ -6,6 +6,7 @@
 #include "collections.h"
 #include "cards.h"
 #include "color_print.h"
+#include "players.h"
 
 // Card*, Player*
 const char* ON_CARD_PLAYED_EVENT_NAME       = "on_card_played";
@@ -21,25 +22,6 @@ const char* ON_CARD_DAMAGED_EVENT_NAME      = "on_card_damaged";
 const char* ON_CARD_KILLED_EVENT_NAME       = "on_card_killed";
 
 HashMap* ALL_CARDS;
-
-typedef struct Player Player;
-
-void _large_slime_played(va_list args){
-    Card* slime = va_arg(args, Card*);
-    printf("%s was played.", slime->name);
-}
-
-static Card LARGE_SLIME = {
-    .name = "Large Slime",
-    .description = "A large gooey slime. It appears to be made of a strange substance that is not water.",
-    .effect = "When Large Slime is targeted, create a 'Small Slime'(0*/1/1) token on the field.",
-
-    .on.played = (Callback)_large_slime_played,
-
-    .pip_cost = 1,
-    .attack = 1,
-    .defense = 1,
-};
 
 static Card SMALL_SLIME = {
     .name = "Small Slime",
@@ -68,6 +50,29 @@ static Card HARMLESS_BAT = {
     .pip_cost = 2,
     .attack = 0,
     .defense = 4,
+};
+
+void _large_slime_played(va_list args){
+    Card* slime = va_arg(args, Card*);
+    Player* player = va_arg(args, Player*);
+    int success = add_card_to_field(player, SMALL_SLIME.name);
+    if(success == -2)
+        print_colored(COLOR_PRINT_RED, "Failed to create copy of small slime.");
+    else if(success == -1)
+        print_colored(COLOR_PRINT_RED, "The small slime was not summoned because the field is full.");
+    print_player_state(player);
+}
+
+static Card LARGE_SLIME = {
+    .name = "Large Slime",
+    .description = "A large gooey slime. It appears to be made of a strange substance that is not water.",
+    .effect = "When Large Slime is targeted, create a 'Small Slime'(0*/1/1) token on the field.",
+
+    .on.played = (Callback)_large_slime_played,
+
+    .pip_cost = 1,
+    .attack = 1,
+    .defense = 1,
 };
 
 void _big_bad_wolf_damaged(va_list args){
@@ -104,62 +109,86 @@ Card* copy_card(Card* original){
 }
 
 void on_card_played(va_list args){
+    va_list args_copy;
+    va_copy(args_copy, args);
     Card* card = va_arg(args, Card*);
+    Player* player = va_arg(args, Player*);
+    
     print_colored(COLOR_PRINT_CYAN, "%s was played.\n", card->name);
     if(card->on.played == NULL) return;
     printf("played...\n");
-    card->on.played(args);
+    card->on.played(args_copy);
 }
 
 void on_card_drawn(va_list args){
+    va_list args_copy;
+    va_copy(args_copy, args);
     Card* card = va_arg(args, Card*);
+    Player* player = va_arg(args, Player*);
+
     print_colored(COLOR_PRINT_CYAN, "%s was drawn.\n", card->name);
     if(card->on.draw == NULL) return;
     printf("draw...\n");
-    card->on.draw(args);
+    card->on.draw(args_copy);
+}
+
+void on_card_killed(va_list args){
+    va_list args_copy;
+    va_copy(args_copy, args);
+    Card* card = va_arg(args, Card*);
+    Player* player = va_arg(args, Player*);
+
+    print_colored(COLOR_PRINT_CYAN, "%s was killed.\n", card->name);
+    if(card->on.killed == NULL) return;
+    printf("killed...\n");
+    card->on.killed(args_copy);
 }
 
 void on_card_targeted(va_list args){
+    va_list args_copy;
+    va_copy(args_copy, args);
     Card* card = va_arg(args, Card*);
+    Card* other_card = va_arg(args, Card*);
     print_colored(COLOR_PRINT_CYAN, "%s was targeted.\n", card->name);
     if(card->on.targeted == NULL) return;
     printf("targeted...\n");
-    card->on.targeted(args);
+    card->on.targeted(args_copy);
 }
 
 void on_card_effect_used(va_list args){
+    va_list args_copy;
+    va_copy(args_copy, args);
     Card* card = va_arg(args, Card*);
-
+    Card* other_card = va_arg(args, Card*);
     print_colored(COLOR_PRINT_CYAN, "%s was used.\n", card->name);
 
     if(card->on.effect_used == NULL) return;
     printf("effect_used...\n"); 
-    card->on.effect_used(args);
+    card->on.effect_used(args_copy);
 }
 
 void on_card_attacked(va_list args){
+    va_list args_copy;
+    va_copy(args_copy, args);
     Card* card = va_arg(args, Card*);
+    Card* other_card = va_arg(args, Card*);
     print_colored(COLOR_PRINT_CYAN, "%s was used.\n", card->name);
     if(card->on.attacked == NULL) return;
     printf("attacked...\n");
-    card->on.attacked(args);
+    card->on.attacked(args_copy);
 }
 
 void on_card_damaged(va_list args){
+    va_list args_copy;
+    va_copy(args_copy, args);
     Card* card = va_arg(args, Card*);
+    Card* other_card = va_arg(args, Card*);
     print_colored(COLOR_PRINT_CYAN, "%s was damaged.\n", card->name);
     if(card->on.damaged == NULL) return;
     printf("damaged...\n");
-    card->on.damaged(args);
+    card->on.damaged(args_copy);
 }
 
-void on_card_killed(va_list args){
-    Card* card = va_arg(args, Card*);
-    print_colored(COLOR_PRINT_CYAN, "%s was killed.\n", card->name);
-    if(card->on.killed == NULL) return;
-    printf("killed...\n");
-    card->on.killed(args);
-}
 
 void init_cards(){
 
@@ -187,6 +216,7 @@ void init_cards(){
 
     ALL_CARDS = hash_map_create(MAX_CARDS);
     hash_map_put(ALL_CARDS, LARGE_SLIME.name, &LARGE_SLIME);
+    hash_map_put(ALL_CARDS, SMALL_SLIME.name, &SMALL_SLIME);
     hash_map_put(ALL_CARDS, HARMLESS_BAT.name, &HARMLESS_BAT);
     hash_map_put(ALL_CARDS, BIG_BAD_WOLF.name, &BIG_BAD_WOLF);
 }
@@ -203,4 +233,19 @@ void free_card(Card* card) {
     if (card) {
         free(card);
     }
+}
+
+void print_card(Card* card){
+    print_colored(COLOR_PRINT_YELLOW, "%s ", card->name);
+    printf("(");
+    print_colored(COLOR_PRINT_CYAN, "%d*", card->pip_cost);
+    printf("/");
+    print_colored(COLOR_PRINT_RED, "%d", card->attack);
+    printf("/");
+    print_colored(COLOR_PRINT_GREEN, "%d", card->defense);
+    printf(")\n");
+    print_colored(COLOR_PRINT_MAGENTA, "    Description:");
+    printf(" %s\n", card->description);
+    print_colored(COLOR_PRINT_MAGENTA, "    Effect:");
+    printf(" %s\n", card->effect);
 }
