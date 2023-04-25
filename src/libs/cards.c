@@ -99,14 +99,25 @@ static Card BIG_BAD_WOLF = {
     .defense = 4,
 };
 
-Card* copy_card(Card* original){
+Card* copy_card(Card* original) {
     Card* copy = malloc(sizeof(Card));
-    if (copy != NULL){
-        memcpy(copy, original, sizeof(Card));
+    if (copy != NULL) {
+        // Copy the non-string fields
+        copy->on = original->on;
+        copy->pip_cost = original->pip_cost;
+        copy->attack = original->attack;
+        copy->defense = original->defense;
+
+        // Allocate and copy the string fields
+        copy->name = strdup(original->name);
+        copy->description = strdup(original->description);
+        copy->effect = strdup(original->effect);
+
         return copy;
     }
     return NULL;
 }
+
 
 void on_card_played(va_list args){
     va_list args_copy;

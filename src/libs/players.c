@@ -5,6 +5,7 @@
 #include "players.h"
 #include "cards.h"
 #include "events.h"
+#include "color_print.h"
 
 Player* create_player(const char* name) {
     Player* player = (Player*)malloc(sizeof(Player));
@@ -28,7 +29,7 @@ void print_player_state(Player* player) {
     }
     printf("Field Size: %d\n", player->field_size);
     for (int i = 0; i < player->field_size; i++) {
-        Card* card = player->hand[i];
+        Card* card = player->field[i];
         print_card(card);
     }
     printf("Deck size: %d\n", player->deck_size);
@@ -54,6 +55,7 @@ int add_card_to_deck(Player* player, const char* card_name) {
         if (card_template) {
             Card* new_card = copy_card(card_template);
             player->deck[player->deck_size++] = new_card;
+            print_colored(COLOR_PRINT_BLUE, "Card '%s' (address: %p) added to %s's DECK.\n", player->deck[player->deck_size-1]->name, player->deck[player->deck_size-1], player->name);
             return 0;
         }
     }
@@ -66,9 +68,8 @@ int add_card_to_field(Player* player, const char* card_name) {
         Card* card_template = hash_map_get(ALL_CARDS, card_name);
         if (card_template) {
             Card* new_card = copy_card(card_template);
-            printf("New Card: %s\n", new_card->name);
             player->field[player->field_size++] = new_card;
-            printf("Card on Field: %s\n", player->field[player->field_size-1]->name);
+            print_colored(COLOR_PRINT_BLUE, "Card '%s' (address: %p) added to %s's FIELD.\n", player->field[player->field_size-1]->name, player->field[player->field_size-1], player->name);
             // Question on whether this should trigger the card played event
             // Maybe it should.
             trigger_event(ON_CARD_PLAYED_EVENT_NAME, player->field[player->field_size-1], player);
@@ -91,6 +92,7 @@ int draw_card(Player* player) {
     }
 
     player->hand[player->hand_size++] = player->deck[--player->deck_size];
+    print_colored(COLOR_PRINT_BLUE, "Card '%s' (address: %p) added to %s's HAND.\n", player->hand[player->hand_size-1]->name, player->hand[player->hand_size-1], player->name);
     trigger_event(ON_CARD_DRAWN_EVENT_NAME, player->hand[player->hand_size-1], player);
     return 0;
 }
@@ -122,6 +124,7 @@ int play_card(Player* player, size_t hand_index) {
           
     player->current_pips -= card->pip_cost;
     player->field[player->field_size++] = card;
+    print_colored(COLOR_PRINT_BLUE, "Card '%s' (address: %p) played by %s.\n", player->field[player->field_size-1]->name, player->field[player->field_size-1], player->name);
     trigger_event(ON_CARD_PLAYED_EVENT_NAME, player->field[player->field_size-1], player);
     
 
@@ -140,6 +143,7 @@ int discard_card(Player* player, size_t field_index) {
     }
     Card* card = player->field[field_index];
     player->discard[player->discard_size++] = card;
+    print_colored(COLOR_PRINT_BLUE, "Card '%s' (address: %p) was killed, poor %s.\n", player->discard[player->discard_size-1]->name, player->discard[player->discard_size-1], player->name);
     trigger_event(ON_CARD_KILLED_EVENT_NAME, player->discard[player->discard_size-1], player);
 
     // Shift remaining cards in field to fill the gap

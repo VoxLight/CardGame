@@ -41,9 +41,9 @@ typedef struct {
  * @brief A structure that represents a card in the game.
  */
 typedef struct {
-    const char* name; /**< The name of the card */
-    const char* description; /**< The description of the card */
-    const char* effect; /**< The effect of the card */
+    char* name; /**< The name of the card */
+    char* description; /**< The description of the card */
+    char* effect; /**< The effect of the card */
 
     Handlers on; /**< The handlers for the card events */
 
