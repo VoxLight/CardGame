@@ -10,7 +10,6 @@ extern const char* ON_CARD_PLAYED_EVENT_NAME;
 extern const char* ON_CARD_DRAWN_EVENT_NAME;
 extern const char* ON_CARD_TARGETED_EVENT_NAME;
 extern const char* ON_CARD_EFFECT_USED_EVENT_NAME;
-extern const char* ON_CARD_DESTROYED_EVENT_NAME;
 extern const char* ON_CARD_ATTACKED_EVENT_NAME;
 extern const char* ON_CARD_DAMAGED_EVENT_NAME;
 extern const char* ON_CARD_KILLED_EVENT_NAME;
@@ -26,14 +25,14 @@ typedef struct {
     Callback attacked;
     Callback damaged;
     Callback killed;
-} Callbacks;
+} Handlers;
 
 typedef struct {
     const char* name;
     const char* description;
     const char* effect;
 
-    Callbacks on;
+    Handlers on;
 
     int pip_cost;
     int attack;
@@ -42,7 +41,6 @@ typedef struct {
 } Card;
 
 Card* copy_card(Card* original);
-void setup_card(Card* card);
 void init_cards();
 void free_cards();
 void free_card(Card* card);

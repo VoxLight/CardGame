@@ -5,11 +5,12 @@
 
 #include "collections.h"
 #include "cards.h"
+#include "color_print.h"
 
 // Card*, Player*
 const char* ON_CARD_PLAYED_EVENT_NAME       = "on_card_played";
 
-
+// Card*, Player*
 const char* ON_CARD_DRAWN_EVENT_NAME        = "on_card_drawn";
 
 
@@ -19,7 +20,6 @@ const char* ON_CARD_ATTACKED_EVENT_NAME     = "on_card_attacked";
 const char* ON_CARD_DAMAGED_EVENT_NAME      = "on_card_damaged";
 const char* ON_CARD_KILLED_EVENT_NAME       = "on_card_killed";
 
-// create in main
 HashMap* ALL_CARDS;
 
 typedef struct Player Player;
@@ -31,14 +31,25 @@ void _large_slime_played(va_list args){
 
 static Card LARGE_SLIME = {
     .name = "Large Slime",
-    .description = "A Large Gooey Slime. It appears to be made of a strange substance that is not water.",
-    .effect = "When Large Slime is targeted, create a 'Small Slime'(/1/1) token on the field.",
+    .description = "A large gooey slime. It appears to be made of a strange substance that is not water.",
+    .effect = "When Large Slime is targeted, create a 'Small Slime'(0*/1/1) token on the field.",
 
     .on.played = (Callback)_large_slime_played,
 
     .pip_cost = 1,
     .attack = 1,
     .defense = 1,
+};
+
+static Card SMALL_SLIME = {
+    .name = "Small Slime",
+    .description = "A small gooey slime. It appears to be made of a strange substance that is not water.",
+    .effect = "No Effect.",
+
+    .pip_cost = 0,
+    .attack = 1,
+    .defense = 1,
+
 };
 
 void _harmless_bat_effect_activated(va_list args){
@@ -83,12 +94,6 @@ static Card BIG_BAD_WOLF = {
     .defense = 4,
 };
 
-void setup_card(Card* card){
-    puts("Setting up Default Event Handlers");
-    printf("%s", card->name);
-
-}
-
 Card* copy_card(Card* original){
     Card* copy = malloc(sizeof(Card));
     if (copy != NULL){
@@ -98,17 +103,92 @@ Card* copy_card(Card* original){
     return NULL;
 }
 
+void on_card_played(va_list args){
+    Card* card = va_arg(args, Card*);
+    print_colored(COLOR_PRINT_CYAN, "%s was played.\n", card->name);
+    if(card->on.played == NULL) return;
+    printf("played...\n");
+    card->on.played(args);
+}
+
+void on_card_drawn(va_list args){
+    Card* card = va_arg(args, Card*);
+    print_colored(COLOR_PRINT_CYAN, "%s was drawn.\n", card->name);
+    if(card->on.draw == NULL) return;
+    printf("draw...\n");
+    card->on.draw(args);
+}
+
+void on_card_targeted(va_list args){
+    Card* card = va_arg(args, Card*);
+    print_colored(COLOR_PRINT_CYAN, "%s was targeted.\n", card->name);
+    if(card->on.targeted == NULL) return;
+    printf("targeted...\n");
+    card->on.targeted(args);
+}
+
+void on_card_effect_used(va_list args){
+    Card* card = va_arg(args, Card*);
+
+    print_colored(COLOR_PRINT_CYAN, "%s was used.\n", card->name);
+
+    if(card->on.effect_used == NULL) return;
+    printf("effect_used...\n"); 
+    card->on.effect_used(args);
+}
+
+void on_card_attacked(va_list args){
+    Card* card = va_arg(args, Card*);
+    print_colored(COLOR_PRINT_CYAN, "%s was used.\n", card->name);
+    if(card->on.attacked == NULL) return;
+    printf("attacked...\n");
+    card->on.attacked(args);
+}
+
+void on_card_damaged(va_list args){
+    Card* card = va_arg(args, Card*);
+    print_colored(COLOR_PRINT_CYAN, "%s was damaged.\n", card->name);
+    if(card->on.damaged == NULL) return;
+    printf("damaged...\n");
+    card->on.damaged(args);
+}
+
+void on_card_killed(va_list args){
+    Card* card = va_arg(args, Card*);
+    print_colored(COLOR_PRINT_CYAN, "%s was killed.\n", card->name);
+    if(card->on.killed == NULL) return;
+    printf("killed...\n");
+    card->on.killed(args);
+}
+
 void init_cards(){
+
     create_event(ON_CARD_PLAYED_EVENT_NAME);
+    register_callback(ON_CARD_PLAYED_EVENT_NAME, (Callback)on_card_played);
+
+    create_event(ON_CARD_DRAWN_EVENT_NAME);
+    register_callback(ON_CARD_DRAWN_EVENT_NAME, (Callback)on_card_drawn);
+
+    create_event(ON_CARD_TARGETED_EVENT_NAME);
+    register_callback(ON_CARD_TARGETED_EVENT_NAME, (Callback)on_card_targeted);
+
+    create_event(ON_CARD_EFFECT_USED_EVENT_NAME);
+    register_callback(ON_CARD_EFFECT_USED_EVENT_NAME, (Callback)on_card_effect_used);
+
+    create_event(ON_CARD_ATTACKED_EVENT_NAME);
+    register_callback(ON_CARD_ATTACKED_EVENT_NAME, (Callback)on_card_attacked);
+
+    create_event(ON_CARD_DAMAGED_EVENT_NAME);
+    register_callback(ON_CARD_DAMAGED_EVENT_NAME, (Callback)on_card_damaged);
+
+    create_event(ON_CARD_KILLED_EVENT_NAME);
+    register_callback(ON_CARD_KILLED_EVENT_NAME, (Callback)on_card_killed);
+
 
     ALL_CARDS = hash_map_create(MAX_CARDS);
-
     hash_map_put(ALL_CARDS, LARGE_SLIME.name, &LARGE_SLIME);
     hash_map_put(ALL_CARDS, HARMLESS_BAT.name, &HARMLESS_BAT);
     hash_map_put(ALL_CARDS, BIG_BAD_WOLF.name, &BIG_BAD_WOLF);
-
-
-    Card* large_slime = hash_map_get(ALL_CARDS, "Large Slime");
 }
 
 void free_cards() {
