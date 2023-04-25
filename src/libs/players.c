@@ -63,7 +63,6 @@ int add_card_to_deck(Player* player, const char* card_name) {
 }
 
 int add_card_to_field(Player* player, const char* card_name) {
-    printf("add_card_to_field_args: %s %s\n", player->name, card_name);
     if (player->field_size < DECK_SIZE) {
         Card* card_template = hash_map_get(ALL_CARDS, card_name);
         if (card_template) {

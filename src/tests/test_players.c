@@ -11,9 +11,9 @@ int main() {
     Player* player = create_player("Alice");
 
     // Add cards to the player's deck
-    add_card_to_deck(player, "Large Slime");
-    add_card_to_deck(player, "Large Slime");
-    add_card_to_deck(player, "Large Slime");
+    add_card_to_deck(player, "Harmless Bat");
+    add_card_to_deck(player, "Small Slime");
+    add_card_to_deck(player, "Big Bad Wolf");
     add_card_to_deck(player, "Large Slime");
 
     printf("Player state after adding cards:\n");
@@ -28,6 +28,8 @@ int main() {
 
     // Play the first card from the hand
     int success = play_card(player, 0);
+    printf("\nPlaying card: %d\n", success);
+    success = play_card(player, 0);
     printf("\nPlaying card: %d\n", success);
     print_player_state(player);
 

@@ -52,7 +52,7 @@ static Card HARMLESS_BAT = {
     .defense = 4,
 };
 
-void _large_slime_played(va_list args){
+void _large_slime_killed(va_list args){
     Card* slime = va_arg(args, Card*);
     Player* player = va_arg(args, Player*);
     int success = add_card_to_field(player, SMALL_SLIME.name);
@@ -60,7 +60,6 @@ void _large_slime_played(va_list args){
         print_colored(COLOR_PRINT_RED, "Failed to create copy of small slime.");
     else if(success == -1)
         print_colored(COLOR_PRINT_RED, "The small slime was not summoned because the field is full.");
-    print_player_state(player);
 }
 
 static Card LARGE_SLIME = {
@@ -68,7 +67,7 @@ static Card LARGE_SLIME = {
     .description = "A large gooey slime. It appears to be made of a strange substance that is not water.",
     .effect = "When Large Slime is targeted, create a 'Small Slime'(0*/1/1) token on the field.",
 
-    .on.played = (Callback)_large_slime_played,
+    .on.killed = (Callback)_large_slime_killed,
 
     .pip_cost = 1,
     .attack = 1,
@@ -127,7 +126,7 @@ void on_card_played(va_list args){
     
     print_colored(COLOR_PRINT_CYAN, "%s was played.\n", card->name);
     if(card->on.played == NULL) return;
-    printf("played...\n");
+    print_colored(COLOR_PRINT_CYAN, "%s\n", card->effect);
     card->on.played(args_copy);
 }
 
@@ -139,7 +138,7 @@ void on_card_drawn(va_list args){
 
     print_colored(COLOR_PRINT_CYAN, "%s was drawn.\n", card->name);
     if(card->on.draw == NULL) return;
-    printf("draw...\n");
+    print_colored(COLOR_PRINT_CYAN, "%s\n", card->effect);
     card->on.draw(args_copy);
 }
 
@@ -151,19 +150,8 @@ void on_card_killed(va_list args){
 
     print_colored(COLOR_PRINT_CYAN, "%s was killed.\n", card->name);
     if(card->on.killed == NULL) return;
-    printf("killed...\n");
+    print_colored(COLOR_PRINT_CYAN, "%s\n", card->effect);
     card->on.killed(args_copy);
-}
-
-void on_card_targeted(va_list args){
-    va_list args_copy;
-    va_copy(args_copy, args);
-    Card* card = va_arg(args, Card*);
-    Card* other_card = va_arg(args, Card*);
-    print_colored(COLOR_PRINT_CYAN, "%s was targeted.\n", card->name);
-    if(card->on.targeted == NULL) return;
-    printf("targeted...\n");
-    card->on.targeted(args_copy);
 }
 
 void on_card_effect_used(va_list args){
@@ -174,7 +162,7 @@ void on_card_effect_used(va_list args){
     print_colored(COLOR_PRINT_CYAN, "%s was used.\n", card->name);
 
     if(card->on.effect_used == NULL) return;
-    printf("effect_used...\n"); 
+    print_colored(COLOR_PRINT_CYAN, "%s\n", card->effect); 
     card->on.effect_used(args_copy);
 }
 
@@ -184,9 +172,9 @@ void on_card_attacked(va_list args){
     Card* card = va_arg(args, Card*);
     Card* other_card = va_arg(args, Card*);
     print_colored(COLOR_PRINT_CYAN, "%s was used.\n", card->name);
-    if(card->on.attacked == NULL) return;
-    printf("attacked...\n");
-    card->on.attacked(args_copy);
+    if(card->on.attack == NULL) return;
+    print_colored(COLOR_PRINT_CYAN, "%s\n", card->effect);
+    card->on.attack(args_copy);
 }
 
 void on_card_damaged(va_list args){
@@ -196,7 +184,7 @@ void on_card_damaged(va_list args){
     Card* other_card = va_arg(args, Card*);
     print_colored(COLOR_PRINT_CYAN, "%s was damaged.\n", card->name);
     if(card->on.damaged == NULL) return;
-    printf("damaged...\n");
+    print_colored(COLOR_PRINT_CYAN, "%s\n", card->effect);
     card->on.damaged(args_copy);
 }
 
@@ -209,14 +197,11 @@ void init_cards(){
     create_event(ON_CARD_DRAWN_EVENT_NAME);
     register_callback(ON_CARD_DRAWN_EVENT_NAME, (Callback)on_card_drawn);
 
-    create_event(ON_CARD_TARGETED_EVENT_NAME);
-    register_callback(ON_CARD_TARGETED_EVENT_NAME, (Callback)on_card_targeted);
-
     create_event(ON_CARD_EFFECT_USED_EVENT_NAME);
     register_callback(ON_CARD_EFFECT_USED_EVENT_NAME, (Callback)on_card_effect_used);
 
-    create_event(ON_CARD_ATTACKED_EVENT_NAME);
-    register_callback(ON_CARD_ATTACKED_EVENT_NAME, (Callback)on_card_attacked);
+    create_event(ON_CARD_ATTACK_EVENT_NAME);
+    register_callback(ON_CARD_ATTACK_EVENT_NAME, (Callback)on_card_attacked);
 
     create_event(ON_CARD_DAMAGED_EVENT_NAME);
     register_callback(ON_CARD_DAMAGED_EVENT_NAME, (Callback)on_card_damaged);

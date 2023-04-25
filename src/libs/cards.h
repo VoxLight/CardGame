@@ -13,9 +13,8 @@
 
 extern const char* ON_CARD_PLAYED_EVENT_NAME; /**< The name of the event that is triggered when a card is played */
 extern const char* ON_CARD_DRAWN_EVENT_NAME; /**< The name of the event that is triggered when a card is drawn */
-extern const char* ON_CARD_TARGETED_EVENT_NAME; /**< The name of the event that is triggered when a card is targeted */
 extern const char* ON_CARD_EFFECT_USED_EVENT_NAME; /**< The name of the event that is triggered when a card's effect is used */
-extern const char* ON_CARD_ATTACKED_EVENT_NAME; /**< The name of the event that is triggered when a card is attacked */
+extern const char* ON_CARD_ATTACK_EVENT_NAME; /**< The name of the event that is triggered when a card is attacked */
 extern const char* ON_CARD_DAMAGED_EVENT_NAME; /**< The name of the event that is triggered when a card is damaged */
 extern const char* ON_CARD_KILLED_EVENT_NAME; /**< The name of the event that is triggered when a card is killed */
 
@@ -28,10 +27,9 @@ extern HashMap* ALL_CARDS; /**< A hash map containing all the cards in the game 
 typedef struct {
     Callback played; /**< The callback function to be called when the card is played */
     Callback draw; /**< The callback function to be called when the card is drawn */
-    Callback targeted; /**< The callback function to be called when the card is targeted */
     Callback effect_used; /**< The callback function to be called when the card's effect is used */
     Callback destroyed; /**< The callback function to be called when the card is destroyed */
-    Callback attacked; /**< The callback function to be called when the card is attacked */
+    Callback attack; /**< The callback function to be called when the card is attacked */
     Callback damaged; /**< The callback function to be called when the card is damaged */
     Callback killed; /**< The callback function to be called when the card is killed */
 } Handlers;
