@@ -78,6 +78,6 @@ for test_file in $TEST_FILES; do
     #     rm "$TEST_DIR/${output_file}"
     # fi
 
-    # Clear processed_libs for the next test file
+    # processed_libs for the next test file
     processed_libs=()
 done

@@ -17,22 +17,12 @@ const char* ON_CARD_DRAWN_EVENT_NAME        = "on_card_drawn";
 
 const char* ON_CARD_TARGETED_EVENT_NAME     = "on_card_targeted";
 const char* ON_CARD_EFFECT_USED_EVENT_NAME  = "on_card_effect_used";
-const char* ON_CARD_ATTACKED_EVENT_NAME     = "on_card_attacked";
+const char* ON_CARD_ATTACK_EVENT_NAME       = "on_card_attacked";
 const char* ON_CARD_DAMAGED_EVENT_NAME      = "on_card_damaged";
 const char* ON_CARD_KILLED_EVENT_NAME       = "on_card_killed";
 
 HashMap* ALL_CARDS;
 
-static Card SMALL_SLIME = {
-    .name = "Small Slime",
-    .description = "A small gooey slime. It appears to be made of a strange substance that is not water.",
-    .effect = "No Effect.",
-
-    .pip_cost = 0,
-    .attack = 1,
-    .defense = 1,
-
-};
 
 void _harmless_bat_effect_activated(va_list args){
     Card* target_card = va_arg(args, Card*);
@@ -52,24 +42,33 @@ static Card HARMLESS_BAT = {
     .defense = 4,
 };
 
+static Card SMALL_SLIME = {
+    .name = "Small Slime",
+    .description = "A small gooey slime. It appears to be made of a strange substance that is not water.",
+    .effect = "No Effect.",
+
+    .pip_cost = 0,
+    .attack = 1,
+    .defense = 1,
+
+};
+
 void _large_slime_killed(va_list args){
     Card* slime = va_arg(args, Card*);
     Player* player = va_arg(args, Player*);
-    int success = add_card_to_field(player, SMALL_SLIME.name);
-    if(success == -2)
-        print_colored(COLOR_PRINT_RED, "Failed to create copy of small slime.");
-    else if(success == -1)
-        print_colored(COLOR_PRINT_RED, "The small slime was not summoned because the field is full.");
+    add_card_to_field(player, SMALL_SLIME.name);
+    add_card_to_field(player, SMALL_SLIME.name);
+
 }
 
 static Card LARGE_SLIME = {
     .name = "Large Slime",
     .description = "A large gooey slime. It appears to be made of a strange substance that is not water.",
-    .effect = "When Large Slime is targeted, create a 'Small Slime'(0*/1/1) token on the field.",
+    .effect = "When Large Slime is killed, create 2 'Small Slime'(0*/1/1) tokens on the field.",
 
     .on.killed = (Callback)_large_slime_killed,
 
-    .pip_cost = 1,
+    .pip_cost = 2,
     .attack = 1,
     .defense = 1,
 };
@@ -117,6 +116,18 @@ Card* copy_card(Card* original) {
     return NULL;
 }
 
+int card_battle(Card* attacker, Card* defender){
+    if(!attacker->attack_ready) return -1;
+
+    print_colored(COLOR_PRINT_BLUE, 
+        "Card '%s' (address: %p) attacked Card '%s' (adress: %p).\n", 
+        attacker->name, attacker, defender->name, defender
+    );
+
+    // Attacker attacks defender
+
+
+}
 
 void on_card_played(va_list args){
     va_list args_copy;
@@ -187,7 +198,6 @@ void on_card_damaged(va_list args){
     print_colored(COLOR_PRINT_CYAN, "%s\n", card->effect);
     card->on.damaged(args_copy);
 }
-
 
 void init_cards(){
 

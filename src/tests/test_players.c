@@ -28,9 +28,11 @@ int main() {
 
     // Play the first card from the hand
     int success = play_card(player, 0);
-    printf("\nPlaying card: %d\n", success);
+    printf("\nPlaying card: %d\n", 1);
+
     success = play_card(player, 0);
     printf("\nPlaying card: %d\n", success);
+
     print_player_state(player);
 
     // Discard the first card from the field

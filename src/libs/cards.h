@@ -6,8 +6,11 @@
 #ifndef CARDS_H
 #define CARDS_H
 
+#include <stdbool.h>
+
 #include "collections.h"
 #include "events.h"
+
 
 #define MAX_CARDS 100 /**< The maximum number of cards that can exist in the game */
 
@@ -48,6 +51,8 @@ typedef struct {
     int pip_cost; /**< The pip cost of the card */
     int attack; /**< The attack value of the card */
     int defense; /**< The defense value of the card */
+
+    bool attack_ready; /**< Whether the card can attack or not */
 
 } Card;
 

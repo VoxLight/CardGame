@@ -50,42 +50,49 @@ void print_player_state(Player* player) {
 // will increase the index and draw decrements the index,
 // so it should always be balanced.
 int add_card_to_deck(Player* player, const char* card_name) {
-    if (player->deck_size < DECK_SIZE) {
-        Card* card_template = hash_map_get(ALL_CARDS, card_name);
-        if (card_template) {
-            Card* new_card = copy_card(card_template);
-            player->deck[player->deck_size++] = new_card;
-            print_colored(COLOR_PRINT_BLUE, "Card '%s' (address: %p) added to %s's DECK.\n", player->deck[player->deck_size-1]->name, player->deck[player->deck_size-1], player->name);
-            return 0;
-        }
+    if (player->deck_size >= DECK_SIZE) {
+        print_colored(COLOR_PRINT_RED, "The '%s' was not added to the deck because the deck is full.", card_name);
+        return -1;
     }
-    return -1;
+    Card* card_template = hash_map_get(ALL_CARDS, card_name);
+    if (card_template == NULL) {
+        print_colored(COLOR_PRINT_RED, "Failed to create copy of '%s'.", card_name);
+        return -2;
+    }
+    Card* new_card = copy_card(card_template);
+    player->deck[player->deck_size++] = new_card;
+    print_colored(COLOR_PRINT_BLUE, "Card '%s' (address: %p) added to %s's DECK.\n", player->deck[player->deck_size-1]->name, player->deck[player->deck_size-1], player->name);
+    return 0;
 }
 
 int add_card_to_field(Player* player, const char* card_name) {
-    if (player->field_size < DECK_SIZE) {
-        Card* card_template = hash_map_get(ALL_CARDS, card_name);
-        if (card_template) {
-            Card* new_card = copy_card(card_template);
-            player->field[player->field_size++] = new_card;
-            print_colored(COLOR_PRINT_BLUE, "Card '%s' (address: %p) added to %s's FIELD.\n", player->field[player->field_size-1]->name, player->field[player->field_size-1], player->name);
-            // Question on whether this should trigger the card played event
-            // Maybe it should.
-            trigger_event(ON_CARD_PLAYED_EVENT_NAME, player->field[player->field_size-1], player);
-            return 0;
-        }
+    if (player->field_size >= DECK_SIZE) {
+        print_colored(COLOR_PRINT_RED, "The '%s' was not summoned because the field is full.", card_name);
+        return -1;
+    }
+
+    Card* card_template = hash_map_get(ALL_CARDS, card_name);
+    if (card_template == NULL) {
+        print_colored(COLOR_PRINT_RED, "Failed to create copy of '%s'.", card_name);
         return -2;
     }
-    return -1;
+
+    Card* new_card = copy_card(card_template);
+    player->field[player->field_size++] = new_card;
+    print_colored(COLOR_PRINT_BLUE, "Card '%s' (address: %p) added to %s's FIELD.\n", player->field[player->field_size-1]->name, player->field[player->field_size-1], player->name);
+    // Question on whether this should trigger the card played event
+    // Maybe it should.
+    trigger_event(ON_CARD_PLAYED_EVENT_NAME, player->field[player->field_size-1], player);
+    return 0;
 }
 
 int draw_card(Player* player) {
     if(player->deck_size == 0) {
-        printf("No more cards in %s's deck.", player->name);
+        print_colored(COLOR_PRINT_RED, "No more cards in %s's deck.", player->name);
         return -2;
     }
     if(player->hand_size == HAND_SIZE){
-        printf("%s already has %d cards in hand. Cannot draw more.",
+        print_colored(COLOR_PRINT_RED, "%s already has %d cards in hand. Cannot draw more.",
         player->name, HAND_SIZE);
         return -1;
     }
@@ -100,23 +107,19 @@ int play_card(Player* player, size_t hand_index) {
     // -2 Gameplay / Rule error
     // -1 Usage error
     if (player->field_size == DECK_SIZE){
-        printf("%s has too many cards on field, unable to play more.", player->name);
+        print_colored(COLOR_PRINT_RED, "%s has too many cards on field, unable to play more.", player->name);
         return -2;
     }
 
     if(hand_index >= player->hand_size){
-        printf("%d is out of range of %s's hand.", hand_index, player->name);
+        print_colored(COLOR_PRINT_RED, "%d is out of range of %s's hand.", hand_index, player->name);
         return -1;
     }
 
     Card* card = player->hand[hand_index];
-    if(!card){
-        puts("Tried to play null card.");
-        return -1;
-    }
 
     if(card->pip_cost > player->current_pips){
-        printf("%s has %d pips. Need %d pips to play %s", 
+        print_colored(COLOR_PRINT_RED, "%s has %d pips. Need %d pips to play %s", 
         player->name, player->current_pips, card->pip_cost, card->name);
         return -2;
     }
@@ -137,7 +140,7 @@ int play_card(Player* player, size_t hand_index) {
 
 int discard_card(Player* player, size_t field_index) {
     if (field_index >= player->field_size){
-        printf("%d is not an index on %s's field.", field_index, player->name);
+        print_colored(COLOR_PRINT_RED, "%d is not an index on %s's field.", field_index, player->name);
         return -1;
     }
     Card* card = player->field[field_index];
@@ -173,4 +176,6 @@ int free_player(Player* player) {
         free(player);
     }
 }
+
+int card_battle(Card* attacker, Card* defender);
 
