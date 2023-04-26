@@ -32,7 +32,7 @@ int game_add_player(Game* game, Player* player){
         );
         return -1;
     }
-    linked_list_append(game->players, player);
+    linked_list_append(&game->players, player);
     return 0;
 }
 

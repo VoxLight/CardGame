@@ -22,22 +22,22 @@ Player* create_player(const char* name) {
 void print_player_state(Player* player) {
     printf("Player: %s\n", player->name);
     printf("Current pips: %d\n", player->current_pips);
-    printf("Hand Size: %d\n", player->hand_size);
+    printf("Hand Size: %ld\n", player->hand_size);
     for (int i = 0; i < player->hand_size; i++) {
         Card* card = player->hand[i];
         print_card(card);
     }
-    printf("Field Size: %d\n", player->field_size);
+    printf("Field Size: %ld\n", player->field_size);
     for (int i = 0; i < player->field_size; i++) {
         Card* card = player->field[i];
         print_card(card);
     }
-    printf("Deck size: %d\n", player->deck_size);
+    printf("Deck size: %ld\n", player->deck_size);
     for (int i = 0; i < player->deck_size; i++) {
         Card* card = player->deck[i];
         print_card(card);
     }
-    printf("Discard size: %d\n", player->discard_size);
+    printf("Discard size: %ld\n", player->discard_size);
     for (int i = 0; i < player->discard_size; i++) {
         Card* card = player->discard[i];
         print_card(card);
