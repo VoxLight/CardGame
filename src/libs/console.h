@@ -32,6 +32,14 @@ typedef struct {
 } Command;
 
 /**
+ * @brief Checks whether the specified message is printable (contains only printable ASCII characters).
+ * 
+ * @param message The message to check.
+ * @return true if the message is printable, false otherwise.
+ */
+bool is_printable(const char* message);
+
+/**
  * @brief Registers a new command with the console.
  * 
  * @param name The name of the command.
@@ -43,12 +51,13 @@ typedef struct {
 int register_command(char* name, char* description, char* usage, CommandCallback callback);
 
 /**
- * @brief Checks whether the specified message is printable (contains only printable ASCII characters).
+ * @brief Gets input from the user.
  * 
- * @param message The message to check.
- * @return true if the message is printable, false otherwise.
+ * @param prompt The prompt to display to the user when requesting input.
+ * 
+ * @return A list of input from the user [cmd_name, arg1, arg2, ...]
  */
-bool is_printable(const char* message);
+char** get_and_parse_input(char* prompt);
 
 /**
  * @brief Initializes and starts the console interface.

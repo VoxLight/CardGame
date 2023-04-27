@@ -113,30 +113,40 @@ char** _command_parse(const char *input) {
     return words;
 }
 
+char** get_and_parse_input(char* prompt) {
+    char message[MAX_MESSAGE_LENGTH];
+    print_colored(COLOR_PRINT_GREEN, "%s", prompt);
+    fgets(message, MAX_MESSAGE_LENGTH, stdin);
+
+    // Check if nothing was entered
+    if (message[0] == '\n') {
+        puts("Nothing was entered.");
+        return get_and_parse_input();
+    }
+
+    // Remove newline character from the input
+    message[strcspn(message, "\n")] = 0;
+
+    if (!is_printable(message)) {
+        puts("Contains invalid characters.");
+        return get_and_parse_input();
+    }
+
+    return _command_parse(message);
+}
 
 void _handle_on_chat(va_list args) {
-    char* message = va_arg(args, char*);
-
-    char** split_message = _command_parse(message);
+    char** split_message = va_arg(args, char**);
     char* command_name = split_message[0];
     char** command_args = split_message + 1;
 
-    // Print the message and args for debug purposes only
-    // printf("Message: %s\n", message);
-    // if (command_args != NULL) {
-    //     printf("Args: ");
-    //     for (int i = 0; command_args[i] != NULL; i++) {
-    //         printf("%s ", command_args[i]);
-    //     }
-    //     printf("\n");
-    // }
-    
-    // Get the command from the hash map and call it's callback
+    // Get the command from the hash map and call its callback
     Command* command = (Command*)hash_map_get(__commands, command_name);
 
     if (command != NULL) {
         command->callback(command_name, command_args);
-    } else {
+    }
+    else {
         _command_not_found(command_name, command_args);
     }
 }
@@ -145,30 +155,19 @@ void _handle_on_chat(va_list args) {
 void start_console_loop() {
     // Main loop
     while (1) {
-        char message[MAX_MESSAGE_LENGTH];
-        print_colored(COLOR_PRINT_GREEN, "Enter a command: ");
-        fgets(message, MAX_MESSAGE_LENGTH, stdin);
+        char** split_message = get_and_parse_input("Enter a command: ");
 
-        // check if nothing was entered
-        // NOT WORKING
-        if(message[0]=='\n'){
-            puts("Nothing was entered.");
+        if (split_message == NULL) {
             continue;
         }
 
-        // Remove newline character from the input
-        message[strcspn(message, "\n")] = 0;
-
-        if(!is_printable(message)){
-            puts("Contains invalid characters.");
-            continue;
-        }
-
-        if (strcmp(message, "exit") == 0) {
+        char* command_name = split_message[0];
+        if (strcmp(command_name, "exit") == 0) {
             break;
-        } else {
+        }
+        else {
             // Trigger the on_chat event with the input message
-            trigger_event("on_chat", message);
+            trigger_event("on_chat", split_message);
         }
     }
 }

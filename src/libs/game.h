@@ -30,6 +30,8 @@ typedef struct {
     
     bool is_playing;
 
+    int num_players;
+
     HashMap* players;
 
     LinkedList turn_order;
@@ -78,6 +80,13 @@ int start_game();
  * @return A pointer to the player that owns the card.
  */
 Player* get_card_owner(Card* card);
+
+/**
+ * @brief Prompts the player to select a number of cards from the given locations.
+ * 
+ * 
+ */
+Card* get_target_card(Player* owner, unsigned int card_locations);
 
 
 

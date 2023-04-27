@@ -24,33 +24,33 @@ const char* ON_CARD_KILLED_EVENT_NAME       = "on_card_killed";
 HashMap* ALL_CARDS;
 
 
-void _lily_fat_cat_played(va_list args){
-    Card* card = va_arg(args, Card*);
-    Player* owner = va_arg(args, Player*);
-
-    // // target a card
-    
-    Card* target_card = get_target_card();
-    // // find the owner of the target card
-    // // copy .on from target_card to card
-    // memcpy(card->on, target_card->on);
-    // strcpy(target_card->effect, card->effect);
-
-}
-
-
-static Card LILY_FAT_CAT = {
-    .name = "Lily, the Fat Cat",
-    .description = "placeholder description",
-    .effect = "When Summoned, can devour 1 card on either field. Lily, the Fat Cat gains the effect(s) of the devoured card.",
-
-    .on.played = (Callback)_lily_fat_cat_played,
-
-    .pip_cost = 3,
-    .attack = 3,
-    .defense = 3,
-
-};
+//void _lily_fat_cat_played(va_list args){
+//    Card* card = va_arg(args, Card*);
+//    Player* owner = va_arg(args, Player*);
+//
+//    // // target a card
+//    
+//    Card* target_card = get_target_card();
+//    // // find the owner of the target card
+//    // // copy .on from target_card to card
+//    // memcpy(card->on, target_card->on);
+//    // strcpy(target_card->effect, card->effect);
+//
+//}
+//
+//
+//static Card LILY_FAT_CAT = {
+//    .name = "Lily, the Fat Cat",
+//    .description = "placeholder description",
+//    .effect = "When Summoned, can devour 1 card on either field. Lily, the Fat Cat gains the effect(s) of the devoured card.",
+//
+//    .on.played = (Callback)_lily_fat_cat_played,
+//
+//    .pip_cost = 3,
+//    .attack = 3,
+//    .defense = 3,
+//
+//};
 
 
 void _harmless_bat_effect_activated(va_list args){

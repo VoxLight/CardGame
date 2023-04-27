@@ -1,11 +1,14 @@
 #include <stdlib.h>
 #include <stdbool.h>
+#include <stdio.h>
 
 // TODO: Remove this include
 #include <assert.h>
 
-#include "game.h"
+#include "collections.h"
 #include "color_print.h"
+#include "game.h"
+
 
 Game* CURRENT_GAME;
 
@@ -30,10 +33,11 @@ int print_current_game_state(){
 
 int init_game(){
     if(_current_game_exists()) _destroy_game(CURRENT_GAME);
-    Game* game = (Game*)malloc(sizeof(Game*) * 1);
+    Game* game = (Game*)malloc(sizeof(Game));
     if(game == NULL) return -1;
     game->current_phase = DRAW_PHASE;
     game->is_playing = false;
+    game->num_players = 0;
     game->players = hash_map_create(MAX_PLAYERS);
     game->turn_order = create_linked_list();
     CURRENT_GAME = game;
@@ -59,7 +63,7 @@ int game_add_player(Player* player){
         );
         return -2;
     }
-    if(CURRENT_GAME->players->size >= MAX_PLAYERS){
+    if(CURRENT_GAME->num_players >= MAX_PLAYERS){
         print_colored(
             COLOR_PRINT_RED, 
             "Unable to add player to game. The game is full.\n"
@@ -79,6 +83,8 @@ int game_add_player(Player* player){
     hash_map_put(CURRENT_GAME->players, player->name, player);
 
     linked_list_append(&(CURRENT_GAME->turn_order), player);
+
+    CURRENT_GAME->num_players++;
 
     return 0;
 }
