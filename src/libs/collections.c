@@ -15,11 +15,10 @@ int linked_list_append(LinkedList* list, void* data) {
     LinkedListNode* new_node = (LinkedListNode*) malloc(sizeof(LinkedListNode));
     new_node->data = data;
     new_node->next = NULL;
-    if (list->tail) {
-        list->tail->next = new_node;
-    } else {
+    if (list->head == NULL)
         list->head = new_node;
-    }
+    else
+        list->tail->next = new_node;
     list->tail = new_node;
     list->size++;
     return 0;

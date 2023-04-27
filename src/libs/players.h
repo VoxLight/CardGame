@@ -18,15 +18,23 @@
  */
 typedef struct {
     const char* name; /**< The name of the Player */
+
+    int max_health; /**< The maximum health that the Player can have */
+    int current_health; /**< The current health of the Player */
+    
     int max_pips; /**< The maximum pips that the Player can have */
     int current_pips; /**< The current number of pips that the Player has */
+
     size_t hand_size; /**< The size of the Player's hand */
-    size_t field_size; /**< The size of the Player's field */
-    size_t deck_size; /**< The size of the Player's deck */
-    size_t discard_size; /**< The size of the Player's discard pile */
     Card* hand[HAND_SIZE]; /**< The array of cards in the Player's hand */
+
+    size_t field_size; /**< The size of the Player's field */
     Card* field[DECK_SIZE]; /**< The array of cards in the Player's field */
+
+    size_t deck_size; /**< The size of the Player's deck */
     Card* deck[DECK_SIZE]; /**< The array of cards in the Player's deck */
+    
+    size_t discard_size; /**< The size of the Player's discard pile */
     Card* discard[DECK_SIZE]; /**< The array of cards in the Player's discard pile */
 } Player;
 

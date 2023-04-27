@@ -74,9 +74,9 @@ for test_file in $TEST_FILES; do
         print_box "Exit code for $test_file: $error_code"
     fi
 
-    # if [ -s "$TEST_DIR/${output_file}" ]; then
-    #     rm "$TEST_DIR/${output_file}"
-    # fi
+    if [ -s "$TEST_DIR/${output_file}" ]; then
+        rm "$TEST_DIR/${output_file}"
+    fi
 
     # processed_libs for the next test file
     processed_libs=()

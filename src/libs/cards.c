@@ -7,13 +7,13 @@
 #include "cards.h"
 #include "color_print.h"
 #include "players.h"
+#include "game.h"
 
 // Card*, Player*
 const char* ON_CARD_PLAYED_EVENT_NAME       = "on_card_played";
 
 // Card*, Player*
 const char* ON_CARD_DRAWN_EVENT_NAME        = "on_card_drawn";
-
 
 const char* ON_CARD_TARGETED_EVENT_NAME     = "on_card_targeted";
 const char* ON_CARD_EFFECT_USED_EVENT_NAME  = "on_card_effect_used";
@@ -29,7 +29,8 @@ void _lily_fat_cat_played(va_list args){
     Player* owner = va_arg(args, Player*);
 
     // // target a card
-    // Card* target_card = get_owner()
+    
+    Card* target_card = get_target_card();
     // // find the owner of the target card
     // // copy .on from target_card to card
     // memcpy(card->on, target_card->on);
@@ -41,16 +42,15 @@ void _lily_fat_cat_played(va_list args){
 static Card LILY_FAT_CAT = {
     .name = "Lily, the Fat Cat",
     .description = "placeholder description",
-    .effect = "When Summoned, can devour a card and gain it's abilities.",
+    .effect = "When Summoned, can devour 1 card on either field. Lily, the Fat Cat gains the effect(s) of the devoured card.",
 
     .on.played = (Callback)_lily_fat_cat_played,
-
 
     .pip_cost = 3,
     .attack = 3,
     .defense = 3,
 
-}
+};
 
 
 void _harmless_bat_effect_activated(va_list args){

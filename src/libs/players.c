@@ -10,8 +10,13 @@
 Player* create_player(const char* name) {
     Player* player = (Player*)malloc(sizeof(Player));
     player->name = name;
+
+    player->max_health = 10;
+    player->current_health = 10;
+
     player->max_pips = 3;
     player->current_pips = 3;
+
     player->hand_size = 0;
     player->field_size = 0;
     player->deck_size = 0;
@@ -20,9 +25,10 @@ Player* create_player(const char* name) {
 }
 
 void print_player_state(Player* player) {
-    printf("Player: %s\n", player->name);
-    printf("Current pips: %d\n", player->current_pips);
-    printf("Hand Size: %ld\n", player->hand_size);
+    print_colored(COLOR_PRINT_YELLOW, "Player: %s\n", player->name);
+    print_colored(COLOR_PRINT_MAGENTA, "Health: %d\n", player->current_health);
+    print_colored(COLOR_PRINT_BLUE, "Current pips: %d\n", player->current_pips);
+    print_colored(COLOR_PRINT_GREEN, "Hand Size: %ld\n", player->hand_size);
     for (int i = 0; i < player->hand_size; i++) {
         Card* card = player->hand[i];
         print_card(card);
@@ -86,7 +92,7 @@ int add_card_to_field(Player* player, const char* card_name) {
     return 0;
 }
 
-int draw_card(Player* player) {
+int draw_card_from_deck(Player* player) {
     if(player->deck_size == 0) {
         print_colored(COLOR_PRINT_RED, "No more cards in %s's deck.", player->name);
         return -2;
@@ -103,7 +109,7 @@ int draw_card(Player* player) {
     return 0;
 }
 
-int play_card(Player* player, size_t hand_index) {
+int play_card_from_hand(Player* player, size_t hand_index) {
     // -2 Gameplay / Rule error
     // -1 Usage error
     if (player->field_size == DECK_SIZE){
@@ -138,7 +144,7 @@ int play_card(Player* player, size_t hand_index) {
     return 0;
 }
 
-int discard_card(Player* player, size_t field_index) {
+int kill_card_on_field(Player* player, size_t field_index) {
     if (field_index >= player->field_size){
         print_colored(COLOR_PRINT_RED, "%d is not an index on %s's field.", field_index, player->name);
         return -1;
