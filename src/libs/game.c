@@ -27,7 +27,7 @@ int make_new_game() {
     game->current_phase = DRAW_PHASE;
     game->is_playing = false;
     game->num_players = 0;
-    game->players = hash_map_create(MAX_PLAYERS);
+    game->players = hash_map_create(MAX_PLAYERS*10);
     game->turn_order = create_linked_list();
     CURRENT_GAME = game;
     return 0;
@@ -36,6 +36,7 @@ int make_new_game() {
 void end_game(){
     // This will reset the game back to an empty state.
     for (int i = 0; i < CURRENT_GAME->players->size; i++) {
+        if (CURRENT_GAME->players->table[i] == NULL) continue;
         Player* player = CURRENT_GAME->players->table[i]->value;
         if (player) reset_player(player);
     }
@@ -116,7 +117,7 @@ int print_current_game_state(){
 
     for (int i = 0; i < CURRENT_GAME->players->size; i++) {
         if (CURRENT_GAME->players->table[i] == NULL) continue;
-        print_player_state(CURRENT_GAME->players->table[i]->value, CURRENT_GAME->is_playing);
+        print_player_state((Player*)CURRENT_GAME->players->table[i]->value, CURRENT_GAME->is_playing);
     }
     return 0;
 }
@@ -174,9 +175,11 @@ int start_game(){
         );
         return -1;
     }
-    for (int i = 0; i < CURRENT_GAME->num_players; i++) {
+    for (int i = 0; i < CURRENT_GAME->players->size; i++) {
         // Must check for null in the hash map.
+        if (CURRENT_GAME->players->table[i] == NULL) continue;
         Player* player = CURRENT_GAME->players->table[i]->value;
+        printf("%d %ld\n", i, CURRENT_GAME->players->size);
         if (player && player->deck_size < 10) {
             print_colored(
 				COLOR_PRINT_RED, 
@@ -191,6 +194,7 @@ int start_game(){
     CURRENT_GAME->current_player_node = CURRENT_GAME->turn_order->head;
     for (int i = 0; i < CURRENT_GAME->num_players; i++){
         // Must check for null in the hash map.
+        if (CURRENT_GAME->players->table[i] == NULL) continue;
         Player* player = CURRENT_GAME->players->table[i]->value;
         if(player) shuffle_deck(player);
         for (int j = 0; j < STARTING_HAND_SIZE; j++) draw_card_from_deck(player);

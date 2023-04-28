@@ -84,7 +84,7 @@ static unsigned long hash(const char* str) {
 HashMap* hash_map_create(size_t size) {
     HashMap *map = malloc(sizeof(HashMap));
     map->size = size;
-    map->table = calloc(size, sizeof(HashNode *));
+    map->table = calloc(size, sizeof(HashNode *) * size);
     return map;
 }
 

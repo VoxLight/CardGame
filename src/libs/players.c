@@ -89,7 +89,7 @@ void print_player_state(Player* player, bool deck_hidden) {
 }
 
 void player_set_attack_and_effect_ready(Player* player) {
-    player->current_pips = player->max_pips;=
+    player->current_pips = player->max_pips;
     for (int i = 0; i < player->field_size; i++) {
         player->field[i]->attack_ready = true;
         player->field[i]->effect_ready = true;

@@ -115,6 +115,7 @@ void cmd_card_battle(char* command_name, char** args) {
         return;
     }
     // This is all so messy and should be cleaned up ASAP.
+    Player* opponent = get_current_game()->current_player_node->next->data;
     if (args[1] == NULL) {
         int index = atoi(args[0]);
         if (index >= ((Player*)get_current_game()->current_player_node->data)->field_size){
@@ -122,7 +123,7 @@ void cmd_card_battle(char* command_name, char** args) {
 			return;
 		}
         // TODO: Make this an event.
-        Player* opponent = get_current_game()->current_player_node->next->data;
+        
         Card* attacker = ((Player*)get_current_game()->current_player_node->data)->field[index];
         if (!attacker->attack_ready) {
             print_colored(COLOR_PRINT_RED, "%s's attack is not ready. Must wait 1 turn after summoning to attack.\n", attacker->name);
@@ -134,10 +135,13 @@ void cmd_card_battle(char* command_name, char** args) {
     }
     int attacker_index = atoi(args[0]);
     int defender_index = atoi(args[1]);
+    if (defender_index >= opponent->field_size) {
+        print_colored(COLOR_PRINT_RED, "[%s]%d is not a valid battle target.\n", command_name, defender_index);
+        return;
+    }
     Card* attacker = ((Player*)get_current_game()->current_player_node->data)->field[attacker_index];
     Card* defender = ((Player*)get_current_game()->current_player_node->next->data)->field[defender_index];
     card_battle(attacker, defender);
-
 }
 
 void cmd_player_info(char* command_name, char** args) {
