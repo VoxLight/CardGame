@@ -192,7 +192,7 @@ int start_game(){
     CURRENT_GAME->is_playing = true;
     CURRENT_GAME->turn_order->tail->next = CURRENT_GAME->turn_order->head;
     CURRENT_GAME->current_player_node = CURRENT_GAME->turn_order->head;
-    for (int i = 0; i < CURRENT_GAME->num_players; i++){
+    for (int i = 0; i < CURRENT_GAME->players->size; i++){
         // Must check for null in the hash map.
         if (CURRENT_GAME->players->table[i] == NULL) continue;
         Player* player = CURRENT_GAME->players->table[i]->value;
