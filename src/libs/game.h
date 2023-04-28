@@ -114,7 +114,7 @@ Player* get_card_owner(Card* card);
  * 
  * 
  */
-Card* get_target_card(Player* owner, unsigned int card_locations);
+//Card* get_target_card(Player* owner, unsigned int card_locations);
 
 /**
  * @brief Two cards battle each other.

@@ -189,7 +189,6 @@ size_t get_card_index_in_location(Card* card, Card** location, size_t location_s
     return location_size; // Indicates that the card was not found in the location
 }
 
-
 int kill_card_on_field(Player* player, size_t field_index) {
     if (field_index >= player->field_size){
         print_colored(COLOR_PRINT_RED, "%d is not an index on %s's field.", field_index, player->name);

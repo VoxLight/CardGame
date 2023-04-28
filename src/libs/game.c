@@ -71,13 +71,6 @@ char* _phase_string(TurnPhase phase) {
 
 }
 
-void _reset_card_stats() { 
-    for (int i = 0; i < CURRENT_GAME->players->size; i++) {
-        Player* player = CURRENT_GAME->players->table[i]->value;
-        if (player && player_owns_card(player, card)) return player;
-    }
-}
-
 void _handle_on_phase_changed() {
     print_colored(COLOR_PRINT_CYAN, "Phase changed to %s.\n", _phase_string(CURRENT_GAME->current_phase));
     switch (CURRENT_GAME->current_phase) {
@@ -197,11 +190,7 @@ Player* get_card_owner(Card* card){
         Player* player = CURRENT_GAME->players->table[i]->value;
         if (player && player_owns_card(player, card)) return player;
     }
-}
-
-Card* get_target_card(Player* owner, unsigned int card_locations){
-    assert(0 > 1);
-    return (Card*)NULL;
+    return NULL;
 }
 
 int card_battle(Card* attacker, Card* defender) {
@@ -210,12 +199,12 @@ int card_battle(Card* attacker, Card* defender) {
     if (attacker->defense <= 0) {
         Card* original_attacker = (Card*)hash_map_get(ALL_CARDS, attacker->name);
         *attacker = *original_attacker;
-        kill_card_on_field(get_card_owner(attacker), attacker);
+        kill_card_on_field(get_card_owner(attacker), get_card_index_in_location(attacker, get_card_owner(attacker)->field, get_card_owner(attacker)->field_size));
     }
     if (defender->defense <= 0) {
         Card* original_defender = (Card*)hash_map_get(ALL_CARDS, defender->name);
         *defender = *original_defender;
-        kill_card_on_field(get_card_owner(defender), defender);
+        kill_card_on_field(get_card_owner(defender), get_card_index_in_location(defender, get_card_owner(defender)->field, get_card_owner(defender)->field_size));
     }
 
     return 0;

@@ -24,16 +24,17 @@ void cmd_echo(char* command_name, char** args) {
     puts("");
 }
 
-void cmd_card_info(char* command_name, char** args){
+void cmd_card_info(char* command_name, char** args) {
     Card* card;
     if (args[0] == NULL) {
         print_colored(COLOR_PRINT_YELLOW, "[%s]No card name specified. Printing all cards.\n", command_name);
         for (int i = 0; i < ALL_CARDS->size; i++) {
-            if(ALL_CARDS->table[i] == NULL) continue;
+            if (ALL_CARDS->table[i] == NULL) continue;
             Card* card = (Card*)(ALL_CARDS->table[i]->value);
             print_card(card);
         }
-    }else {
+    }
+    else {
         Card* card = hash_map_get(ALL_CARDS, args[0]);
         if (card == NULL) {
             print_colored(COLOR_PRINT_RED, "[%s]Card \"%s\" not found.\n", command_name, args[0]);
@@ -44,7 +45,7 @@ void cmd_card_info(char* command_name, char** args){
 
 }
 
-void cmd_add_player(char* command_name, char** args){
+void cmd_add_player(char* command_name, char** args) {
     if (args[0] == NULL) {
         print_colored(COLOR_PRINT_RED, "[%s]Player not created. No player name specified.\n", command_name);
         return;
@@ -54,37 +55,37 @@ void cmd_add_player(char* command_name, char** args){
         print_colored(COLOR_PRINT_RED, "[%s]Failed to create player \"%s\".\n", command_name, args[0]);
         return;
     }
-    if(game_add_player(player) == 0)
+    if (game_add_player(player) == 0)
         print_colored(COLOR_PRINT_GREEN, "[%s]Created player \"%s\".\n", command_name, player->name);
 }
 
-void cmd_game_info(){
+void cmd_game_info() {
     print_current_game_state();
 }
 
 void cmd_add_card_player_deck(char* command_name, char** args) {
     if (args[0] == NULL || args[1] == NULL) {
-		print_colored(COLOR_PRINT_RED, "[%s]Player/card name NOT specified.\n", command_name);
-		return;
-	}
+        print_colored(COLOR_PRINT_RED, "[%s]Player/card name NOT specified.\n", command_name);
+        return;
+    }
 
     if (get_current_game()->is_playing) {
         print_colored(COLOR_PRINT_RED, "[%s]Cannot add cards while a game is in progress.\n", command_name);
         return;
     }
 
-	Player* player = hash_map_get(get_current_game()->players, args[0]);
+    Player* player = hash_map_get(get_current_game()->players, args[0]);
     if (player == NULL) {
-		print_colored(COLOR_PRINT_RED, "[%s]Player \"%s\" not found.\n", command_name, args[0]);
-		return;
-	}
-	Card* card = hash_map_get(ALL_CARDS, args[1]);
+        print_colored(COLOR_PRINT_RED, "[%s]Player \"%s\" not found.\n", command_name, args[0]);
+        return;
+    }
+    Card* card = hash_map_get(ALL_CARDS, args[1]);
     if (card == NULL) {
-		print_colored(COLOR_PRINT_RED, "[%s]Card \"%s\" not found.\n", command_name, args[1]);
-		return;
-	}
+        print_colored(COLOR_PRINT_RED, "[%s]Card \"%s\" not found.\n", command_name, args[1]);
+        return;
+    }
     if (add_card_to_deck(player, args[1]) == 0) {
-		print_colored(COLOR_PRINT_GREEN, "[%s]Added card \"%s\" to player \"%s\".\n", command_name, card->name, player->name);  
+        print_colored(COLOR_PRINT_GREEN, "[%s]Added card \"%s\" to player \"%s\".\n", command_name, card->name, player->name);
     }
 }
 
@@ -98,6 +99,40 @@ void cmd_end_game() {
 
 void cmd_step_game() {
     step_current_game();
+}
+
+void cmd_card_battle(char* command_name, char** args) {
+    if (get_current_game()->current_phase != BATTLE_PHASE) {
+        print_colored(COLOR_PRINT_RED, "[%]You can only attack during your Battle Phase.\n", command_name);
+        return;
+    }
+    if (args[0] == NULL) {
+        print_colored(COLOR_PRINT_RED, "[%]You must specify the index of attacker and target, or attacker when opponent has no cards.\n", command_name);
+        return;
+    }
+    if (args[1] == NULL && ((Player*)(get_current_game()->current_player_node->next->data))->field_size > 0) {
+        print_colored(COLOR_PRINT_RED, "[%]Opponent has cards, you must attack a card on the field.\n", command_name);
+        return;
+    }
+    // This is all so messy and should be cleaned up ASAP.
+    if (args[1] == NULL) {
+        int index = atoi(args[0]);
+        if (index >= ((Player*)get_current_game()->current_player_node->data)->field_size){
+			print_colored(COLOR_PRINT_RED, "[%s]%d is not a valid index.\n", command_name, index);
+			return;
+		}
+        // TODO: Make this an event.
+        Player* opponent = get_current_game()->current_player_node->next->data;
+        Card* attacker = ((Player*)get_current_game()->current_player_node->data)->field[index];
+        print_colored(COLOR_PRINT_RED, "[%]%s is attacked directly by %s and loses 1 hp.\n", command_name, opponent->name, attacker->name);
+        opponent->current_health--;
+    }
+    int attacker_index = atoi(args[0]);
+    int defender_index = atoi(args[1]);
+    Card* attacker = ((Player*)get_current_game()->current_player_node->data)->field[attacker_index];
+    Card* defender = ((Player*)get_current_game()->current_player_node->data)->field[defender_index];
+    card_battle(attacker, defender);
+
 }
 
 void cmd_player_info(char* command_name, char** args) {
@@ -143,6 +178,7 @@ int main(){
     register_command("step", "This is how you indicate you are done with your current phase, and move to the next phase.", "step", cmd_step_game);
     register_command("player", "Prints information about a player.", "player \"<player name>\"", cmd_player_info);
     register_command("play", "Plays a card from your hand.", "play <hand index>", cmd_play_card);
+    register_command("battle", "Make one of your cards attack a card (or your opponent if no cards are on the field). Just pass your card index to attack the opponent.", "battle <field index> (field index)", cmd_card_battle);
 
 
     start_console_loop();
