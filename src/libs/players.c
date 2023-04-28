@@ -132,11 +132,11 @@ int add_card_to_field(Player* player, const char* card_name) {
 
 int draw_card_from_deck(Player* player) {
     if(player->deck_size == 0) {
-        print_colored(COLOR_PRINT_RED, "No more cards in %s's deck.", player->name);
+        print_colored(COLOR_PRINT_RED, "No more cards in %s's deck.\n", player->name);
         return -2;
     }
     if(player->hand_size == HAND_SIZE){
-        print_colored(COLOR_PRINT_RED, "%s already has %d cards in hand. Cannot draw more.",
+        print_colored(COLOR_PRINT_RED, "%s already has %d cards in hand. Cannot draw more.\n",
         player->name, HAND_SIZE);
         return -1;
     }
@@ -151,19 +151,19 @@ int play_card_from_hand(Player* player, size_t hand_index) {
     // -2 Gameplay / Rule error
     // -1 Usage error
     if (player->field_size == DECK_SIZE){
-        print_colored(COLOR_PRINT_RED, "%s has too many cards on field, unable to play more.", player->name);
+        print_colored(COLOR_PRINT_RED, "%s has too many cards on field, unable to play more.\n", player->name);
         return -2;
     }
 
     if(hand_index >= player->hand_size){
-        print_colored(COLOR_PRINT_RED, "%d is out of range of %s's hand.", hand_index, player->name);
+        print_colored(COLOR_PRINT_RED, "%d is out of range of %s's hand.\n", hand_index, player->name);
         return -1;
     }
 
     Card* card = player->hand[hand_index];
 
     if(card->pip_cost > player->current_pips){
-        print_colored(COLOR_PRINT_RED, "%s has %d pips. Need %d pips to play %s", 
+        print_colored(COLOR_PRINT_RED, "%s has %d pips. Need %d pips to play %s\n", 
         player->name, player->current_pips, card->pip_cost, card->name);
         return -2;
     }
@@ -191,7 +191,7 @@ size_t get_card_index_in_location(Card* card, Card** location, size_t location_s
 
 int kill_card_on_field(Player* player, size_t field_index) {
     if (field_index >= player->field_size){
-        print_colored(COLOR_PRINT_RED, "%d is not an index on %s's field.", field_index, player->name);
+        print_colored(COLOR_PRINT_RED, "%d is not an index on %s's field.\n", field_index, player->name);
         return -1;
     }
     Card* card = player->field[field_index];
