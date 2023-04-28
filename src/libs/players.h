@@ -12,7 +12,8 @@
 #include "cards.h" // for Card
 
 #define DECK_SIZE 20 /**< The size of the deck of cards for the Player */
-#define HAND_SIZE 7 /**< The size of the hand of cards for the Player */
+#define STARTING_HAND_SIZE 5 /**< The size of the starting hand of cards for the Player */
+#define HAND_SIZE 10 /**< The size of the hand of cards for the Player */
 
 /**
  * @struct Player
@@ -68,6 +69,14 @@ void reset_player(Player* player);
  * @param player The Player to print the state of.
  */
 void print_player_state(Player* player, bool deck_hidden);
+
+
+/**
+ * @brief Sets all cards, on the specified Player's field, attack and effect ready flags to true.
+ * 
+ * @param player The Player whose card's flags will be set.
+ */
+void player_set_attack_and_effect_ready(Player* player);
 
 /**
  * @brief Adds a card with the specified name to the deck of the specified Player.

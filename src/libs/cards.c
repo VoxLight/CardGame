@@ -54,9 +54,16 @@ HashMap* ALL_CARDS;
 
 
 void _harmless_bat_effect_activated(va_list args){
-    Card* target_card = va_arg(args, Card*);
-    Player* target_player = va_arg(args, Player*);
-    puts("Harmless Bat effect activated");
+    Card* card = va_arg(args, Card*);
+    Player* player = va_arg(args, Player*);
+    if (player->current_pips == 0) {
+        print_colored(COLOR_PRINT_RED, "%s does not have enough pips to activate the effect of %s.", player->name, card->name);
+        return;
+    }
+    player->current_health++;
+    player->current_pips--;
+    print_colored(COLOR_PRINT_CYAN, "%s now has %s health.", player->name, player->current_health);
+    card->effect_ready = false;
 }
 
 static Card HARMLESS_BAT = {
@@ -69,6 +76,9 @@ static Card HARMLESS_BAT = {
     .pip_cost = 2,
     .attack = 0,
     .defense = 4,
+
+    .attack_ready = false,
+    .effect_ready = false,
 };
 
 static Card SMALL_SLIME = {
@@ -80,6 +90,8 @@ static Card SMALL_SLIME = {
     .attack = 1,
     .defense = 1,
 
+    .attack_ready = false,
+    .effect_ready = false,
 };
 
 void _large_slime_killed(va_list args){
@@ -100,6 +112,9 @@ static Card LARGE_SLIME = {
     .pip_cost = 2,
     .attack = 1,
     .defense = 1,
+
+    .attack_ready = false,
+    .effect_ready = false,
 };
 
 void _big_bad_wolf_damaged(va_list args){
@@ -109,7 +124,7 @@ void _big_bad_wolf_damaged(va_list args){
     Card* base_card = hash_map_get(ALL_CARDS, target_card->name);
     if (target_card->attack >= base_card->attack+3) return;
     target_card->attack++;
-    puts("The big bad wolf gained an attack.");
+    print_colored(COLOR_PRINT_CYAN, "The big bad wolf gained an attack.\n");
 
 }
 
@@ -124,6 +139,9 @@ static Card BIG_BAD_WOLF = {
     .pip_cost = 3,
     .attack = 3,
     .defense = 4,
+
+    .attack_ready = false,
+    .effect_ready = false,
 };
 
 Card* copy_card(Card* original) {
@@ -221,6 +239,7 @@ void on_card_attacked(va_list args){
     if(card->on.attack == NULL) return;
     print_colored(COLOR_PRINT_CYAN, "%s\n", card->effect);
     card->on.attack(args_copy);
+    card->attack_ready = false;
 }
 
 void on_card_damaged(va_list args){

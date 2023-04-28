@@ -53,6 +53,7 @@ typedef struct {
     int defense; /**< The defense value of the card */
 
     bool attack_ready; /**< Whether the card can attack or not */
+    bool effect_ready;
 
 } Card;
 

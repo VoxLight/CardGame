@@ -88,6 +88,14 @@ void print_player_state(Player* player, bool deck_hidden) {
     puts("");
 }
 
+void player_set_attack_and_effect_ready(Player* player) {
+    player->current_pips = player->max_pips;=
+    for (int i = 0; i < player->field_size; i++) {
+        player->field[i]->attack_ready = true;
+        player->field[i]->effect_ready = true;
+    }
+}
+
 // Note about how add_card_to_deck and draw_card work.
 // We don't remove the cards from the deck, but instead
 // we use the index to keep track of where we are. Add

@@ -46,7 +46,7 @@ void end_game(){
 
 int step_current_game() {
     if (!CURRENT_GAME->is_playing) {
-        print_colored(COLOR_PRINT_RED, "Cannot step a game that has not been started.");
+        print_colored(COLOR_PRINT_RED, "Cannot step a game that has not been started.\n");
         return -1;
     }
     //print_colored(COLOR_PRINT_BLUE, "Phase '%d' -> '%d'.\n", CURRENT_GAME->current_phase, (CURRENT_GAME->current_phase + 1) % __num_phases);
@@ -77,7 +77,9 @@ void _handle_on_phase_changed() {
 
         case DRAW_PHASE:
             CURRENT_GAME->current_player_node = CURRENT_GAME->current_player_node->next;
-            print_colored(COLOR_PRINT_CYAN, "It is now %s's turn.\n", ((Player*)CURRENT_GAME->current_player_node->data)->name);
+            Player* player = CURRENT_GAME->current_player_node->data;
+            print_colored(COLOR_PRINT_CYAN, "It is now %s's turn.\n", player->name);
+            player_set_attack_and_effect_ready(player);
             //print_colored(COLOR_PRINT_CYAN, "Turn Change: '%s' -> '%s'\n", ((Player*)CURRENT_GAME->current_player_node->data)->name, ((Player*)CURRENT_GAME->current_player_node->next->data)->name);
             draw_card_from_deck(CURRENT_GAME->current_player_node->data);
             break;
@@ -172,6 +174,18 @@ int start_game(){
         );
         return -1;
     }
+    for (int i = 0; i < CURRENT_GAME->num_players; i++) {
+        // Must check for null in the hash map.
+        Player* player = CURRENT_GAME->players->table[i]->value;
+        if (player && player->deck_size < 10) {
+            print_colored(
+				COLOR_PRINT_RED, 
+				"Unable to start the game. Player \"%s\" does not have enough cards in their deck.\n", 
+				player->name
+			);
+			return -2;
+		}
+    }
     CURRENT_GAME->is_playing = true;
     CURRENT_GAME->turn_order->tail->next = CURRENT_GAME->turn_order->head;
     CURRENT_GAME->current_player_node = CURRENT_GAME->turn_order->head;
@@ -179,6 +193,7 @@ int start_game(){
         // Must check for null in the hash map.
         Player* player = CURRENT_GAME->players->table[i]->value;
         if(player) shuffle_deck(player);
+        for (int j = 0; j < STARTING_HAND_SIZE; j++) draw_card_from_deck(player);
     }
     trigger_event(ON_PHASE_CHANGE_EVENT_NAME);
 
@@ -194,17 +209,27 @@ Player* get_card_owner(Card* card){
 }
 
 int card_battle(Card* attacker, Card* defender) {
+    if (!attacker->attack_ready) {
+        print_colored(COLOR_PRINT_RED, "%s's attack is not ready. Must wait 1 turn after summoning to attack.\n", attacker->name);
+        return -1;
+    }
+    trigger_event(ON_CARD_ATTACK_EVENT_NAME, attacker, defender, get_card_owner(attacker));
     attacker->defense -= defender->attack;
     defender->defense -= attacker->attack;
     if (attacker->defense <= 0) {
         Card* original_attacker = (Card*)hash_map_get(ALL_CARDS, attacker->name);
         *attacker = *original_attacker;
         kill_card_on_field(get_card_owner(attacker), get_card_index_in_location(attacker, get_card_owner(attacker)->field, get_card_owner(attacker)->field_size));
+    } else {
+        trigger_event(ON_CARD_DAMAGED_EVENT_NAME, attacker, defender, get_card_owner(attacker));
     }
     if (defender->defense <= 0) {
+        printf("AAAAA");
         Card* original_defender = (Card*)hash_map_get(ALL_CARDS, defender->name);
         *defender = *original_defender;
         kill_card_on_field(get_card_owner(defender), get_card_index_in_location(defender, get_card_owner(defender)->field, get_card_owner(defender)->field_size));
+    } else {
+        trigger_event(ON_CARD_DAMAGED_EVENT_NAME, defender, attacker, get_card_owner(defender));
     }
 
     return 0;
