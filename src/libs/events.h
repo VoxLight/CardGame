@@ -23,8 +23,8 @@ typedef void (*Callback)(va_list args);
  */
 typedef struct {
     char* name; /**< The name of the event */
-    LinkedList callbacks; /**< The linked list of function pointers to callbacks */
-} __Event;
+    LinkedList* callbacks; /**< The linked list of function pointers to callbacks */
+} Event;
 
 /**
  * @brief Creates a new event with the specified name.

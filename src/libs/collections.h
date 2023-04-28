@@ -30,7 +30,7 @@ typedef struct {
  * 
  * @return The newly created linked list.
  */
-LinkedList create_linked_list();
+LinkedList* create_linked_list();
 
 /**
  * @brief Appends the specified data to the end of the list.
@@ -56,6 +56,14 @@ void* linked_list_remove(LinkedList* list, int index);
  * @param list The linked list to destroy.
  */
 void destroy_linked_list(LinkedList* list);
+
+/**
+ * @brief Copies the specified linked list to the destination linked list.
+ * 
+ * @param dest_list The destination linked list.
+ * @param src_list The source linked list.
+ */
+LinkedList* linked_list_copy(LinkedList* src_list);
 
 /**
  * @struct HashNode
@@ -116,5 +124,13 @@ void hash_map_remove(HashMap* map, const char* key);
  * @param map The hash map to free.
  */
 void hash_map_free(HashMap* map);
+
+/**
+ * @brief Copies the specified hash map to the destination hash map.
+ * 
+ * @param dest_map The destination hash map.
+ * @param src_map The source hash map.
+ */
+HashMap* hash_map_copy(HashMap* src_map);
 
 #endif // COLLECTIONS_H

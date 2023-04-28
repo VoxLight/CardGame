@@ -3,11 +3,11 @@
 
 #include "collections.h"
 
-LinkedList create_linked_list(){
-    LinkedList list;
-    list.head = NULL;
-    list.tail = NULL;
-    list.size = 0;
+LinkedList* create_linked_list(){
+    LinkedList* list = malloc(sizeof(LinkedList));
+    list->head = NULL;
+    list->tail = NULL;
+    list->size = 0;
     return list;
 }
 
@@ -60,7 +60,17 @@ void destroy_linked_list(LinkedList* list) {
     list->size = 0;
 }
 
-static unsigned long hash(const char *str) {
+LinkedList* linked_list_copy(LinkedList* src_list) {
+    LinkedList* dest_list = create_linked_list();
+    LinkedListNode* current_node = src_list->head;
+    while (current_node != NULL) {
+        linked_list_append(dest_list, current_node->data);
+        current_node = current_node->next;
+    }
+    return dest_list;
+}
+
+static unsigned long hash(const char* str) {
     unsigned long hash = 5381;
     int c;
 
@@ -71,14 +81,14 @@ static unsigned long hash(const char *str) {
     return hash;
 }
 
-HashMap *hash_map_create(size_t size) {
+HashMap* hash_map_create(size_t size) {
     HashMap *map = malloc(sizeof(HashMap));
     map->size = size;
     map->table = calloc(size, sizeof(HashNode *));
     return map;
 }
 
-void hash_map_put(HashMap *map, const char *key, void *value) {
+void hash_map_put(HashMap* map, const char* key, void* value) {
     unsigned long index = hash(key) % map->size;
     HashNode *node = map->table[index];
 
@@ -97,7 +107,7 @@ void hash_map_put(HashMap *map, const char *key, void *value) {
     map->table[index] = node;
 }
 
-void *hash_map_get(HashMap *map, const char *key) {
+void* hash_map_get(HashMap* map, const char *key) {
     unsigned long index = hash(key) % map->size;
     HashNode *node = map->table[index];
 
@@ -111,7 +121,7 @@ void *hash_map_get(HashMap *map, const char *key) {
     return NULL;
 }
 
-void hash_map_remove(HashMap *map, const char *key) {
+void hash_map_remove(HashMap* map, const char *key) {
     unsigned long index = hash(key) % map->size;
     HashNode *node = map->table[index];
     HashNode *prev = NULL;
@@ -132,7 +142,7 @@ void hash_map_remove(HashMap *map, const char *key) {
     }
 }
 
-void hash_map_free(HashMap *map) {
+void hash_map_free(HashMap* map) {
     for (size_t i = 0; i < map->size; i++) {
         HashNode *node = map->table[i];
         while (node) {
@@ -144,4 +154,17 @@ void hash_map_free(HashMap *map) {
     }
     free(map->table);
     free(map);
+}
+
+HashMap* hash_map_copy(HashMap* src_map) {
+    HashMap* dest_map = hash_map_create(src_map->size);
+    for (size_t i = 0; i < src_map->size; i++) {
+        HashNode* current_node = src_map->table[i];
+
+        while (current_node != NULL) {
+            hash_map_put(dest_map, current_node->key, current_node->value);
+            current_node = current_node->next;
+        }
+    }
+    return dest_map;
 }

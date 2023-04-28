@@ -121,7 +121,7 @@ char** get_and_parse_input(char* prompt) {
     // Check if nothing was entered
     if (message[0] == '\n') {
         puts("Nothing was entered.");
-        return get_and_parse_input();
+        return get_and_parse_input(prompt);
     }
 
     // Remove newline character from the input
@@ -129,7 +129,7 @@ char** get_and_parse_input(char* prompt) {
 
     if (!is_printable(message)) {
         puts("Contains invalid characters.");
-        return get_and_parse_input();
+        return get_and_parse_input(prompt);
     }
 
     return _command_parse(message);

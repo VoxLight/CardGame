@@ -7,7 +7,9 @@
 #define PLAYERS_H
 
 #include <stddef.h> // for size_t
-#include "cards.h"
+#include <stdbool.h> // for bool
+
+#include "cards.h" // for Card
 
 #define DECK_SIZE 20 /**< The size of the deck of cards for the Player */
 #define HAND_SIZE 7 /**< The size of the hand of cards for the Player */
@@ -47,21 +49,45 @@ typedef struct {
 Player* create_player(const char* name);
 
 /**
+ * @brief Shuffles the deck of the specified Player.
+ * 
+ * @param player The Player whose deck will be shuffled.
+ */
+void shuffle_deck(Player* player);
+
+/**
+ * @brief Resets the specified Player's health and pips to their maximum values as well as putting all cards back into the deck.
+ * 
+ * @param player The Player to reset.
+ */
+void reset_player(Player* player);
+
+/**
  * @brief Prints the state of the specified Player.
  * 
  * @param player The Player to print the state of.
  */
-void print_player_state(Player* player);
+void print_player_state(Player* player, bool deck_hidden);
 
 /**
  * @brief Adds a card with the specified name to the deck of the specified Player.
  * 
  * @param player The Player whose deck the card will be added to.
  * @param card_name The name of the card to be added.
+ * 
  * @return 0 if the card was successfully added, or -1 if an error occurred.
  */
 int add_card_to_deck(Player* player, const char* card_name);
 
+/**
+ * @brief Removes the card at the specified index from the specified Player's deck.
+ * 
+ * @param player The Player whose deck the card will be removed from.
+ * @param index The index of the card to be removed.
+ * 
+ * @return The removed card, or NULL if an error occurred.
+ */
+size_t get_card_index_in_location(Card* card, Card** location, size_t location_size);
 
 /**
  * @brief Adds a card with the specified name to the field of the specified Player.
@@ -78,7 +104,7 @@ int add_card_to_field(Player* player, const char* card_name);
  * @param player The Player who is drawing a card.
  * @return 0 if a card was successfully drawn, -1 if there are no cards left in the deck, or -2 if an error occurred.
  */
-int draw_card(Player* player);
+int draw_card_from_deck(Player* player);
 
 /**
  * @brief Plays the card at the specified index in the specified Player's hand and adds it to their field.
@@ -87,7 +113,7 @@ int draw_card(Player* player);
  * @param hand_index The index of the card in the Player's hand to be played.
  * @return 0 if the card was successfully played, or -1 if an error occurred.
  */
-int play_card(Player* player, size_t hand_index);
+int play_card_from_hand(Player* player, size_t hand_index);
 
 /**
  * @brief Discards the card at the specified index in the specified Player's field and adds it to their discard pile.
@@ -96,7 +122,7 @@ int play_card(Player* player, size_t hand_index);
  * @param field_index The index of the card in the Player's field to be discarded.
  * @return 0 if the card was successfully discarded, or -1 if an error occurred.
  */
-int discard_card(Player* player, size_t field_index);
+int kill_card_on_field(Player* player, size_t field_index);
 
 /**
  * @brief Frees the memory used by the specified Player.
@@ -105,5 +131,15 @@ int discard_card(Player* player, size_t field_index);
  * @return 0 if the memory was successfully freed, or -1 if an error occurred.
  */
 int free_player(Player* player);
+
+/**
+ * @brief Checks if the specified Player has a card instance in their card locations.
+ * 
+ * @param player The Player to check.
+ * @param card The card instance to check for.
+ * 
+ * @return true if the Player has no cards in their deck, false otherwise.
+ */
+int player_owns_card(Player* player, Card* card);
 
 #endif // PLAYERS_H

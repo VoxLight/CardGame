@@ -8,6 +8,8 @@
 
 #define MAX_PLAYERS 2
 
+extern const char* ON_PHASE_CHANGE_EVENT_NAME;
+
 typedef enum {
     OWNER_DECK      = 0b1,
     ANY_DECK        = 0b10,
@@ -15,12 +17,15 @@ typedef enum {
     ANY_HAND        = 0b1000,
     OWNER_DISCARD   = 0b10000,
     ANY_DISCARD     = 0b100000,
+    OWNER_FIELD     = 0b1000000,
+    ANY_FIELD       = 0b10000000,
 } CardLocation;
 
 typedef enum {
     DRAW_PHASE,
     MAIN_PHASE,
     BATTLE_PHASE,
+    __num_phases,
 } TurnPhase;
 
 
@@ -34,11 +39,18 @@ typedef struct {
 
     HashMap* players;
 
-    LinkedList turn_order;
+    LinkedList* turn_order;
 
     LinkedListNode* current_player_node;
 
 } Game;
+
+/**
+ * @brief Iteratively calls all the print commands of the players in the game.
+ * 
+ * @return -1 if something went wrong. 0 otherwise.
+ */
+int print_current_game_state();
 
 /**
  * @brief Creates a new Game struct in memory and returns it.
@@ -46,6 +58,8 @@ typedef struct {
  * @return A pointer to the newly created Game struct.
  */
 int init_game();
+
+
 
 /**
  * @brief Gets the current game.
@@ -72,6 +86,20 @@ int game_add_player(Player* player);
 int start_game();
 
 /**
+ * @brief Ends the game.
+ * 
+ * @param game The game to end.
+ */
+void end_game();
+
+/**
+ * @brief Steps the game phase and turn order by one.
+ * 
+ * @return 0 for success.
+ */
+int step_current_game();
+
+/**
  * @brief Gets the player that owns the given card.
  * 
  * @param game The game to search for the card in.
@@ -87,6 +115,16 @@ Player* get_card_owner(Card* card);
  * 
  */
 Card* get_target_card(Player* owner, unsigned int card_locations);
+
+/**
+ * @brief Two cards battle each other.
+ * 
+ * @param attacker The attacking card.
+ * @param defender The defending card.
+ * 
+ * @return 0 if the battle was a draw, 1 if the attacker won, -1 if the defender won, 2 if both cards died.
+ */
+int card_battle(Card* attacker, Card* defender);
 
 
 

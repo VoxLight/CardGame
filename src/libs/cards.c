@@ -145,26 +145,16 @@ Card* copy_card(Card* original) {
     return NULL;
 }
 
-int card_battle(Card* attacker, Card* defender){
-    if(!attacker->attack_ready) return -1;
-
-    print_colored(COLOR_PRINT_BLUE, 
-        "Card '%s' (address: %p) attacked Card '%s' (adress: %p).\n", 
-        attacker->name, attacker, defender->name, defender
-    );
-
-    // Attacker attacks defender
-
-
-}
-
 void on_card_played(va_list args){
     va_list args_copy;
     va_copy(args_copy, args);
     Card* card = va_arg(args, Card*);
     Player* player = va_arg(args, Player*);
-    
-    print_colored(COLOR_PRINT_CYAN, "%s was played.\n", card->name);
+
+    print_colored(COLOR_PRINT_YELLOW, "%s ", player->name);
+    print_colored(COLOR_PRINT_CYAN, "played ");
+    print_colored(COLOR_PRINT_YELLOW, "\"%s\" ", card->name);
+    print_colored(COLOR_PRINT_CYAN, "from their hand.\n");
     if(card->on.played == NULL) return;
     print_colored(COLOR_PRINT_CYAN, "%s\n", card->effect);
     card->on.played(args_copy);
@@ -176,7 +166,11 @@ void on_card_drawn(va_list args){
     Card* card = va_arg(args, Card*);
     Player* player = va_arg(args, Player*);
 
-    print_colored(COLOR_PRINT_CYAN, "%s was drawn.\n", card->name);
+    print_colored(COLOR_PRINT_YELLOW, "%s ", player->name);
+    print_colored(COLOR_PRINT_CYAN, "drew ");
+    print_colored(COLOR_PRINT_YELLOW, "\"%s\" ", card->name);
+    print_colored(COLOR_PRINT_CYAN, "from the top of their deck.\n");
+
     if(card->on.draw == NULL) return;
     print_colored(COLOR_PRINT_CYAN, "%s\n", card->effect);
     card->on.draw(args_copy);
@@ -188,7 +182,9 @@ void on_card_killed(va_list args){
     Card* card = va_arg(args, Card*);
     Player* player = va_arg(args, Player*);
 
-    print_colored(COLOR_PRINT_CYAN, "%s was killed.\n", card->name);
+    print_colored(COLOR_PRINT_YELLOW, "%s's ", player->name);
+    print_colored(COLOR_PRINT_YELLOW, "\"%s\" ", card->name);
+    print_colored(COLOR_PRINT_CYAN, "was killed!\n");
     if(card->on.killed == NULL) return;
     print_colored(COLOR_PRINT_CYAN, "%s\n", card->effect);
     card->on.killed(args_copy);
@@ -199,8 +195,12 @@ void on_card_effect_used(va_list args){
     va_copy(args_copy, args);
     Card* card = va_arg(args, Card*);
     Card* other_card = va_arg(args, Card*);
-    print_colored(COLOR_PRINT_CYAN, "%s was used.\n", card->name);
+    Player* player = va_arg(args, Player*);
 
+    print_colored(COLOR_PRINT_YELLOW, "%s ", player->name);
+    print_colored(COLOR_PRINT_CYAN, "used ");
+    print_colored(COLOR_PRINT_YELLOW, "\"%s's\" ", card->name);
+    print_colored(COLOR_PRINT_CYAN, "effect!\n");
     if(card->on.effect_used == NULL) return;
     print_colored(COLOR_PRINT_CYAN, "%s\n", card->effect); 
     card->on.effect_used(args_copy);
@@ -211,7 +211,13 @@ void on_card_attacked(va_list args){
     va_copy(args_copy, args);
     Card* card = va_arg(args, Card*);
     Card* other_card = va_arg(args, Card*);
-    print_colored(COLOR_PRINT_CYAN, "%s was used.\n", card->name);
+    Player* player = va_arg(args, Player*);
+
+    print_colored(COLOR_PRINT_YELLOW, "%s ", player->name);
+    print_colored(COLOR_PRINT_CYAN, "attacked ");
+    print_colored(COLOR_PRINT_YELLOW, "\"%s\" ", other_card->name);
+    print_colored(COLOR_PRINT_CYAN, "with their ");
+    print_colored(COLOR_PRINT_YELLOW, "\"%s\"\n", card->name);
     if(card->on.attack == NULL) return;
     print_colored(COLOR_PRINT_CYAN, "%s\n", card->effect);
     card->on.attack(args_copy);
@@ -222,7 +228,8 @@ void on_card_damaged(va_list args){
     va_copy(args_copy, args);
     Card* card = va_arg(args, Card*);
     Card* other_card = va_arg(args, Card*);
-    print_colored(COLOR_PRINT_CYAN, "%s was damaged.\n", card->name);
+    Player* player = va_arg(args, Player*);
+
     if(card->on.damaged == NULL) return;
     print_colored(COLOR_PRINT_CYAN, "%s\n", card->effect);
     card->on.damaged(args_copy);

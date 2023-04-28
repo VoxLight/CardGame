@@ -20,23 +20,23 @@ int main() {
     print_player_state(player);
 
     // Draw two cards
-    draw_card(player);
-    draw_card(player);
+    draw_card_from_deck(player);
+    draw_card_from_deck(player);
 
     printf("\nPlayer state after drawing two cards:\n");
     print_player_state(player);
 
     // Play the first card from the hand
-    int success = play_card(player, 0);
+    int success = play_card_from_hand(player, 0);
     printf("\nPlaying card: %d\n", 1);
 
-    success = play_card(player, 0);
+    success = play_card_from_hand(player, 0);
     printf("\nPlaying card: %d\n", success);
 
     print_player_state(player);
 
     // Discard the first card from the field
-    discard_card(player, 0);
+    kill_card_on_field(player, 0);
     printf("\nPlayer state after discarding a card from the field:\n");
     print_player_state(player);
 

@@ -1,0 +1,14 @@
+create_player Player1
+create_player Player2
+add_card Player1 "Big Bad Wolf"
+add_card Player1 "Big Bad Wolf"
+add_card Player1 "Big Bad Wolf"
+add_card Player1 "Large Slime"
+add_card Player1 "Large Slime"
+add_card Player1 "Large Slime"
+add_card Player2 "Large Slime"
+add_card Player2 "Large Slime"
+add_card Player2 "Large Slime"
+add_card Player2 "Harmless Bat"
+add_card Player2 "Harmless Bat"
+add_card Player2 "Harmless Bat"
