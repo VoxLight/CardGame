@@ -3,7 +3,7 @@
 *.zip
 
 # VS
-**.vscode
+.vscode
 .vs
 
 # Prerequisites
